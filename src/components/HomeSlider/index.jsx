@@ -1,3 +1,5 @@
+// Slider de imágenes en la página de inicio
+
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from 'swiper/modules';
 import 'swiper/css';

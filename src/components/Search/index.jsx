@@ -1,3 +1,4 @@
+// Buscador de productos en el header
 import SearchIcon from '@mui/icons-material/Search';
 const Search = () => {
   return (

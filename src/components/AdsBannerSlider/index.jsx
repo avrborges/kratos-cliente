@@ -1,4 +1,5 @@
-import React from 'react'
+// Seccion de banner de anuncios
+
 import { Link } from 'react-router-dom'
 
 const MockAds = [

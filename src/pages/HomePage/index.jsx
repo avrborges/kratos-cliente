@@ -1,3 +1,4 @@
+// Home Page con sliders de productos y banners
 import React from 'react'
 import HomeSlider from '../../components/HomeSlider'
 import CategorySlider from '../../components/Header/CategorySlider'
@@ -18,9 +19,12 @@ const HomePage = ({ MockCategories }) => {
 
   return (
     <>
+      {/* Slider principal de la página de inicio */}
       <HomeSlider />
+      {/* Slider de categorías */}
       <CategorySlider MockCategories={MockCategories} />
-
+      
+      {/* Sección de productos más vendidos */}
       <section className='py-5 bg-white mt-5'>
         <div className="container mt-10">
           <div className='flex items-center justify-between'>
@@ -48,9 +52,9 @@ const HomePage = ({ MockCategories }) => {
           <ProductsSlider />
         </div>
       </section>
-
+      
+      {/* Sección de envío gratis */}
       <section className='py-4 bg-white flex flex-col gap-2'>
-
         <div className="container flex justify-center">
           <div className="EnvioBanner flex items-center justify-between w-[80%] border border-primary p-6">
             <div className="col_1 flex items-center">
@@ -75,6 +79,7 @@ const HomePage = ({ MockCategories }) => {
       
       </section>
 
+      {/* Sección de nuevos productos */}
       <section className='py-5 bg-white'>
         <div className="container mt-10">
           <div className='flex items-center justify-between'>
@@ -90,6 +95,7 @@ const HomePage = ({ MockCategories }) => {
         </div>
       </section>
 
+      {/* Sección de productos destacados */}  
       <section className='py-0 bg-white'>
         <div className="container mt-10">
           <div className='flex items-center justify-between'>

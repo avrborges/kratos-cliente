@@ -14,6 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 const Header = ({ MockCategories }) => {
   return (
     <header>
+        {/* Top Strip */}
         <div className='top-strip py-1 border-b border-gray-300 bg-white'>
             <div className='container'>
                 <div className='flex justify-between items-center'>
@@ -33,21 +34,25 @@ const Header = ({ MockCategories }) => {
                 </div>
             </div>
         </div>
-
+        {/* Main Header */} 
         <div className='header border-b border-gray-300 py-4 bg-white'>
             <div className='container flex justify-between items-center p-2'>
+                {/* Logo */}
                 <div className='col1 w-[25%]'>
                     <Link to='/' className='text-[24px] font-bold'>KRATOS</Link>
                 </div>
+                {/* Buscador */}
                 <div className='col2 w-[45%]'>
                     <Search />
                 </div>
+                {/* Login & Registro */}
                 <div className='col3 w-[30%] flex items-center justify-center gap-4'>
                     <ul className='flex items-center gap-2'>
                         <li className='flex items-start gap-2 justify-start'>
                         <Link to='/' className='text-[14px] link transition'>Login</Link>|
                         <Link to='/' className='text-[14px] link transition'>Registro</Link>
                         </li>
+                        {/* Iconos de usuario */}
                         <li className='ml-4'>
                         <Tooltip title="Comparar Productos">
                             <IconButton>

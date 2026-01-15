@@ -1,3 +1,4 @@
+// Menú de navegación superior con categorías y enlaces
 import Button from '@mui/material/Button'
 import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';

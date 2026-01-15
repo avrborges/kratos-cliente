@@ -1,5 +1,5 @@
+// Panel lateral deslizante para categorías de productos
 
-// CategoryPanel.jsx
 import PropTypes from 'prop-types';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';

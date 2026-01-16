@@ -2,6 +2,7 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import Header from './components/Header'
+import Footer from './components/Footer'
 
 const MockCategories = [
   {
@@ -50,6 +51,7 @@ function App() {
       <Routes>
         <Route path='/' element={<HomePage MockCategories={MockCategories} />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
     </>
   )

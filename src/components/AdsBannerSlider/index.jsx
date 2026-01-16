@@ -27,8 +27,8 @@ const MockAds = [
 
 const AdsBannerSlider = () => {
   return (
-    <div className='AdsBannerSlider mt-10'>
-        <div className="container flex justify-center gap-6">
+    <div className='AdsBannerSlider w-[90%] mx-auto mt-5 '>
+        <div className="adsWrapper flex items-center justify-center gap-5 overflow-x-auto py-3">
             {MockAds.map(ad => (
                 <Link key={ad.id} to={ad.link}>
                     <div className="adItem w-[300px] h-[250px] overflow-hidden rounded-sm shadow-lg hover:shadow-xl transition-all">

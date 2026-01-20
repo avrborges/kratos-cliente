@@ -9,7 +9,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import { Link } from 'react-router-dom';
 
-const CategoryPanel = ({ open, onClose, MockCategories }) => {
+import logo from '../../../assets/DRAKOS.png';
+// Mock Data
+import { MockCategories } from '../../../mocks';
+const CategoryPanel = ({ open, onClose }) => {
   const list = (
     <div
       className="w-[280px] pl-4 pt-2" // ancho del panel (Tailwind opcional)
@@ -18,9 +21,10 @@ const CategoryPanel = ({ open, onClose, MockCategories }) => {
         if (e.key === 'Escape') onClose();
       }}
     >
-      <div className="px-4 py-3 font-semibold text-gray-800">
-        <h1 className='text-[25px] uppercase font-bold'>Kratos</h1>
-        <h2>Categorías</h2>
+
+      <div className="px-4 py-3 font-semibold text-gray-800 flex flex-col items-start gap-1">
+        <img src={logo} alt="logo" className="w-[200px]" />
+        <h2 className="text-[18px] font-bold pl-2">Categorías</h2>
       </div>
       <Divider />
 

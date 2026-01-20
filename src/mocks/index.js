@@ -1,0 +1,5 @@
+export * from './blogpost.mock.js'
+export * from './ads.mock.js'
+export * from './banner.mock.js'
+export * from './categorias.mock.js'
+export * from './productos.mock.js'

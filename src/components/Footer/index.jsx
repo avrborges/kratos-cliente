@@ -6,13 +6,15 @@ import { MdAlternateEmail } from "react-icons/md";
 import { IoMdPin } from "react-icons/io";
 import { Link } from 'react-router-dom';
 import Checkbox from '@mui/material/Checkbox';
+import FormSuscription from './NewsletterForm';
 
 
 const Footer = () => {
   return (
     
-    <footer className='py-8 bg-white'>
+    <footer className='pt-8 bg-white'>
         <div className="container">
+            {/* Datos de contacto */}
             <div className="flex items-center justify-center gap-6 text-center mx-auto w-[100%] pb-12 border-b border-gray-300 ">
                 <div className='col flex items-center justify-center flex-col group w-[30%]'>
                     <LocalShippingOutlinedIcon className='!text-[40px]'/>
@@ -44,6 +46,7 @@ const Footer = () => {
             </div>
 
             <div className="flex mt-5 gap-8 items-center justify-between">
+                {/* Links de interes */}
                 <div className='col p-2 w-[30%]'>
                     <h3 className='text-[18px] font-bold'>
                         Contacto
@@ -109,28 +112,23 @@ const Footer = () => {
                     <p className='text-[14px] font-[300] mt-2'>
                         Recibe las últimas novedades, promociones y ofertas.
                     </p>
-                    <div className='flex items-center justify-center gap-2 mt-8'>
-                        <form action="" className='flex items-center justify-center gap-2'> 
-                            <div className='flex gap-2'>
-                                <input type="checkbox" className='w-[20px] h-[20px] border border-gray-300' checked />
-                                <span className='block w-full'>
-                                    Acepto los términos y condiciones   
-                                </span>
-                            </div>
-                            <div className='flex gap-2'> 
-                                <input type="email" className='w-[90%] h-[40px]  border border-gray-300' placeholder='Ingresa tu email'/>
-                                <button className='w-[190px] h-[40px] bg-[#000000] text-white font-semibold'>
-                                    Suscribirse
-                                </button>
-                            </div>
-                        </form>
 
+                    <div className='mt-4'>
+                        {/* Formulario de Suscripcion a Newsletters */}
+                        <FormSuscription />
                     </div>
                 </div>
             </div>
-        
+            <div className='border-t border-gray-300 mt-5'>
+                <div className="max-w-5xl mx-auto py-4 text-center">
+                    <p className="text-sm text-gray-600 font-light">
+                    © {new Date().getFullYear()} Todos los derechos reservados.
+                    </p>
+                </div>
+            </div>
         </div>
     </footer>
+    
 
 )
 }

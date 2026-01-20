@@ -7,7 +7,10 @@ import { Link } from 'react-router-dom';
 import CategoryPanel from './CategoryPanel';
 import { useCallback, useState } from 'react';
 
-const Navigation = ({ MockCategories }) => {
+// Mock Data
+import { MockCategories } from '../../../mocks';
+
+const Navigation = () => {
 
     const [openCategoryPanel, setOpenCategoryPanel] = useState(false);
 

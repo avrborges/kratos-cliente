@@ -8,8 +8,10 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import { Link } from 'react-router-dom';
 
+// Mock Data
+import { MockCategories } from '../../../mocks';
 
-const CategorySlider = ({ MockCategories }) => {
+const CategorySlider = () => {
   return (
     <div className='categorySlider'>
         <div className='container'>

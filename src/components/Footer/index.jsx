@@ -5,7 +5,6 @@ import { FaWhatsapp } from "react-icons/fa";
 import { MdAlternateEmail } from "react-icons/md";
 import { IoMdPin } from "react-icons/io";
 import { Link } from 'react-router-dom';
-import Checkbox from '@mui/material/Checkbox';
 import FormSuscription from './NewsletterForm';
 
 
@@ -74,7 +73,7 @@ const Footer = () => {
                     <ul className='list'>
                         <li className='list-none text-[14px] w-full mb-2'>
                             <Link to="/">
-                                Como comprar
+                                Preguntas Frecuentes
                             </Link>
                         </li>
                         <li className='list-none text-[14px] w-full mb-2'>

@@ -82,5 +82,7 @@ input { padding: 15px; }
 .productInfo {
   text-align: left !important;
 }
-.procuctItems:hover {
+
+.ReactCollapse--collapse {
+  transition: height 500ms !important;
 }

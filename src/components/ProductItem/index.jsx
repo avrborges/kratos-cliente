@@ -44,7 +44,7 @@ const ProductItem = ({
   // const wrapperProps = to ? { to } : {};
 
   return (
-    <div className="productItem overflow-hidden bg-white border-1 border-gray-300 shadow-lg ">
+    <div className="productItem overflow-hidden bg-white border-1 border-gray-300">
       {/* Imagen + Badges + Actions */}
       <div className="group relative imageWrapper border border-gray-200 bg-white w-[100%] h-[250px] overflow-hidden">
         {/* <Wrapper {...wrapperProps}> */}
@@ -94,7 +94,7 @@ const ProductItem = ({
       <div className="productInfo p-3 border-t border-gray-200 bg-[#f1f1f1] h-[210px] flex flex-col justify-between">
         <h6 className="text-sm">{item.brand}</h6>
         {/* <Wrapper {...wrapperProps}> */}
-          <h3 className="text-[15px] font-semibold">{item.description}</h3>
+          <h3 className="text-[15px] font-semibold">{item.name}</h3>
         {/* </Wrapper> */}
 
         <Rating name="read-only" value={item.rating} readOnly size="small" />

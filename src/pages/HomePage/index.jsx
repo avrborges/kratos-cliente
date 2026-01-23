@@ -122,7 +122,7 @@ const HomePage = () => {
               </span>
             </div>
             <div className="col_2">
-            <Link to="/deals">
+            <Link to="/productListing">
               <button className='bg-black text-white py-3 px-6 rounded-sm hover:bg-gray-800 cursor-pointer transition-all'>
                 Comprar ahora
               </button>

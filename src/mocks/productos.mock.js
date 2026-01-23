@@ -93,7 +93,7 @@ export const MockItems = [
         stock: 30,
         featured: true,
         image: 'https://serviceapi.spicezgold.com/download/1742462746789_zoom_1-1673275632.webp',
-        createdAt: '2026-01-15T11:00:00Z'
+        createdAt: '2026-01-20T11:00:00Z'
     },
     {
         id: 7,

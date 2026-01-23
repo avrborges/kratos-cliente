@@ -86,3 +86,10 @@ input { padding: 15px; }
 .ReactCollapse--collapse {
   transition: height 500ms !important;
 }
+.range-slider {
+  height: 3px !important;
+}
+.range-slider .range-slider__thumb {
+  width: 14px !important;
+  height: 14px !important;
+}

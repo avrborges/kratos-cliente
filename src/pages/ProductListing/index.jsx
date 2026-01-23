@@ -12,6 +12,14 @@ const ProductListing = () => {
                 </h1>
                 <Sidebar />
             </div>
+            <div className="productsWrapper w-[80%] p-3">
+                <h1 className='text-[18px] font-[800] uppercase w-full border-b border-gray-200 pb-3'>
+                  Productos
+                </h1>
+                <div className='grid grid-cols-4 md:grid-cols-4 gap-4 mt-3'>
+
+                </div>
+            </div>
         </div>
     </section>
   )

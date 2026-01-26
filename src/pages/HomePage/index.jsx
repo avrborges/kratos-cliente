@@ -49,6 +49,7 @@ const HomePage = () => {
         // Desempate (opcional): más reciente primero
         return new Date(b.createdAt) - new Date(a.createdAt);
       })
+      .filter(item => Number(item.stock) > 0) // solo con stock
       .slice(0, 5);
   }, [value]);
 
@@ -56,20 +57,22 @@ const HomePage = () => {
   const sortedByNew = React.useMemo(() => {
     return [...MockItems]
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 5); // Top 10 nuevos
+      .filter(item => Number(item.stock) > 0) // solo con stock
+      .slice(0, 5); // Top 5 nuevos
   }, []);
 
   // Filtrar productos destacados
   const featuredProducts = React.useMemo(() => {
     return [...MockItems]
-      .filter(item => item.featured === true)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      .filter(item => item.featured === true && Number(item.stock) > 0) // solo destacados con stock  
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5); // Top 5 destacados
   }, []);
 
   // Filtrar últimos disponibles (stock bajo)
   const lastAvailable5 = React.useMemo(() => {
     return [...MockItems]
-      .filter(item => Number(item.stock) <= 5)       // productos con poco stock
+      .filter(item => Number(item.stock) <= 5 && Number(item.stock) > 0)       // productos con poco stock
       .sort((a, b) => a.stock - b.stock)            // opcional: menor stock primero
       .slice(0, 5);                                 // Top 5 últimos disponibles
   }, []);

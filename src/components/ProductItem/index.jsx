@@ -99,8 +99,11 @@ const ProductItem = ({
 
         <Rating name="read-only" value={item.rating} readOnly size="small" />
 
-        {item.stock <= 5 && (
+        {item.stock <= 5 && item.stock > 0 && (
           <div className="text-red-500 text-sm font-semibold">Últimos disponibles</div>
+        )}
+        {item.stock === 0 && (
+          <div className="text-gray-500 text-sm font-semibold">Sin stock</div>
         )}
 
         <div className="priceInfo mt-2 flex items-center justify-between w-full">
@@ -119,9 +122,13 @@ const ProductItem = ({
         </div>
 
         <div className="btnWrapper mt-4 flex justify-center gap-2">
-          <button className="btn btn-secondary" onClick={() => onAddToCart(item)}>
+          <Button 
+            className="btn btn-secondary" 
+            onClick={() => onAddToCart(item)}
+            disabled={item.stock === 0}
+          >
             Agregar al carrito
-          </button>
+          </Button>
         </div>
       </div>
     </div>

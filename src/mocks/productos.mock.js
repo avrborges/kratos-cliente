@@ -158,5 +158,37 @@ export const MockItems = [
         featured: false,
         image: 'https://serviceapi.spicezgold.com/download/1742462760123_zoom_1-1673275660.webp',
         createdAt: '2024-07-02T17:00:00Z'
+    },
+    {
+        id: 11,
+        category: 'Calzados',
+        brand: 'Adidas',
+        name: 'Producto 11',
+        description: 'Descripción del producto 11',
+        rating: 3,
+        price: 109999,
+        offerprice: 99999,
+        discount: 10,
+        totalSales: 140,
+        stock: 0,
+        featured: false,
+        image: 'https://serviceapi.spicezgold.com/download/1742462763456_zoom_1-1673275667.webp',
+        createdAt: '2024-07-05T19:00:00Z'
+    },
+    {
+        id: 12,
+        category: 'Ofertas',
+        brand: 'Nike',
+        name: 'Producto 12',
+        description: 'Descripción del producto 12',
+        rating: 5,
+        price: 119999,
+        offerprice: 109999,
+        discount: 15,
+        totalSales: 320,
+        stock: 0,
+        featured: true,
+        image: 'https://serviceapi.spicezgold.com/download/1742462766789_zoom_1-1673275674.webp',
+        createdAt: '2024-07-08T21:00:00Z'
     }
 ]

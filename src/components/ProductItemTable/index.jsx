@@ -73,20 +73,24 @@ const ProductItemTable = ({
 
     {/* Títulos */}
     <div>
-      <h6 className="text-sm">{item.brand}</h6>
-      <h3 className="text-[16px] font-semibold leading-tight">{item.description}</h3>
+      <h6 className="text-sm mb-1">{item.brand}</h6>
+      <h3 className="text-[16px] font-semibold leading-tight mb-1">{item.name}</h3>
+      <p className="text-sm text-gray-600 mb-1">{item.description}</p>
     </div>
 
     {/* Rating */}
     <Rating name="read-only" value={item.rating} readOnly size="small" />
 
     {/* Stock */}
-    {item.stock <= 5 && (
-      <div className="text-red-500 text-sm font-semibold">Últimos disponibles</div>
+    {item.stock <= 5 && item.stock > 0 && (
+      <div className="text-red-500 text-sm font-semibold mt-2">Últimos disponibles</div>
+    )}
+    {item.stock === 0 && (
+      <div className="text-gray-500 text-sm font-semibold mt-2">Sin stock</div>
     )}
 
     {/* Precios */}
-    <div className="flex items-center justify-between mt-2">
+    <div className="flex items-center justify-between mt-1">
       <div>
         {showDiscount && (
           <span className="text-sm line-through text-gray-500">
@@ -105,12 +109,13 @@ const ProductItemTable = ({
     {/* Botones abajo */}
     <div className="flex items-center justify-between mt-3">
 
-      <button
+      <Button
         className="btn btn-secondary"
         onClick={() => onAddToCart(item)}
+        disabled={item.stock === 0}
       >
         Agregar al carrito
-      </button>
+      </Button>
 
       {/* Acciones a la derecha */}
       <div className="flex gap-2">

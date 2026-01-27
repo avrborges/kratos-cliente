@@ -6,8 +6,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import { Link } from 'react-router-dom';
-import ProductItem from '../ProductItem';
-
+import ProductItem from '../../components/ProductItem';
 
 // Función para determinar si un producto es nuevo (agregado en los últimos 5 días)
 
@@ -34,7 +33,6 @@ const ProductsSlider = ({MockItems}) => {
                   onQuickView={(it) => console.log('Quick view:', it)}
                   onWishlist={(it) => console.log('Wishlist:', it)}
                   onShare={(it) => console.log('Compartir:', it)}
-                // to={`/producto/${item.id}`} // si querés linkear al detalle
               />
             </SwiperSlide>
           ))}

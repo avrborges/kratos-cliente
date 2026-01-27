@@ -12,7 +12,13 @@ export const MockItems = [
         totalSales: 150,
         stock: 50,
         featured: true,
-        image: 'https://serviceapi.spicezgold.com/download/1742462729829_zoom_1-1673275594.webp',
+        size: ['S', 'M', 'L', 'XL'],
+        colors: [ 'Rojo', 'Azul', 'Verde' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=1",
+            "https://picsum.photos/1000/1200?random=2",
+            "https://picsum.photos/1000/1200?random=3",
+        ],
         createdAt: '2024-06-01T10:00:00Z'
     },
     {
@@ -28,8 +34,14 @@ export const MockItems = [
         totalSales: 200,
         stock: 75,
         featured: true,
-        image: 'https://serviceapi.spicezgold.com/download/1742462733293_zoom_1-1673275603.webp',
-        createdAt: '2024-06-05T12:00:00Z'
+        size:[ 'S', 'M', 'L' ],
+        colors: [ 'Negro', 'Blanco', 'Azul' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=4",
+            "https://picsum.photos/1000/1200?random=5",
+            "https://picsum.photos/1000/1200?random=6",
+        ],
+        createdAt: '2024-06-15T08:00:00Z'
     },
     {
         id: 3,
@@ -44,7 +56,13 @@ export const MockItems = [
         totalSales: 100,
         stock: 3,
         featured: false,
-        image: 'https://serviceapi.spicezgold.com/download/1742462736761_zoom_1-1673275611.webp',
+        size: [ 'S', 'M', 'L' ],
+        colors: [ 'Rojo', 'Azul', 'Verde' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=7",
+            "https://picsum.photos/1000/1200?random=8",
+            "https://picsum.photos/1000/1200?random=9",
+        ],
         createdAt: '2024-06-10T14:00:00Z'
     },
     {
@@ -60,7 +78,13 @@ export const MockItems = [
         totalSales: 180,
         stock: 20,
         featured: false,
-        image: 'https://serviceapi.spicezgold.com/download/1742462740123_zoom_1-1673275618.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: ['Negro', 'Blanco', 'Azul' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=10",
+            "https://picsum.photos/1000/1200?random=11",
+            "https://picsum.photos/1000/1200?random=12",
+        ],
         createdAt: '2024-06-15T16:00:00Z'
     },
     {
@@ -76,7 +100,13 @@ export const MockItems = [
         totalSales: 80,
         stock: 5,
         featured: false,
-        image: 'https://serviceapi.spicezgold.com/download/1742462743461_zoom_1-1673275625.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: [ 'Rojo', 'Azul', 'Verde' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=13",
+            "https://picsum.photos/1000/1200?random=14",
+            "https://picsum.photos/1000/1200?random=15",
+        ],
         createdAt: '2024-06-20T18:00:00Z'
     },
     {
@@ -92,7 +122,13 @@ export const MockItems = [
         totalSales: 250,
         stock: 30,
         featured: true,
-        image: 'https://serviceapi.spicezgold.com/download/1742462746789_zoom_1-1673275632.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: [ 'Negro', 'Blanco', 'Azul' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=16",
+            "https://picsum.photos/1000/1200?random=17",
+            "https://picsum.photos/1000/1200?random=18",
+        ],
         createdAt: '2026-01-20T11:00:00Z'
     },
     {
@@ -108,7 +144,13 @@ export const MockItems = [
         totalSales: 220,
         stock: 15,
         featured: true,
-        image: 'https://serviceapi.spicezgold.com/download/1742462750123_zoom_1-1673275639.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: [ 'Rojo', 'Azul', 'Verde' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=19",
+            "https://picsum.photos/1000/1200?random=20",
+            "https://picsum.photos/1000/1200?random=21",
+        ],
         createdAt: '2024-06-25T09:00:00Z'
     },
     {
@@ -124,7 +166,13 @@ export const MockItems = [
         totalSales: 160,
         stock: 8,
         featured: false,
-        image: 'https://serviceapi.spicezgold.com/download/1742462753456_zoom_1-1673275646.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: [ 'Negro', 'Blanco', 'Azul' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=22",
+            "https://picsum.photos/1000/1200?random=23",
+            "https://picsum.photos/1000/1200?random=24",
+        ],
         createdAt: '2024-06-28T13:00:00Z'
     },
     {
@@ -140,7 +188,13 @@ export const MockItems = [
         totalSales: 300,
         stock: 25,
         featured: true,
-        image: 'https://serviceapi.spicezgold.com/download/1742462756789_zoom_1-1673275653.webp',
+        size: ['S', 'M', 'L', 'XL'],
+        colors: [ 'Rojo', 'Azul', 'Verde' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=25",
+            "https://picsum.photos/1000/1200?random=26",
+            "https://picsum.photos/1000/1200?random=27",
+        ],
         createdAt: '2024-06-30T15:00:00Z'
     },
     {
@@ -156,7 +210,13 @@ export const MockItems = [
         totalSales: 280,
         stock: 12,
         featured: false,
-        image: 'https://serviceapi.spicezgold.com/download/1742462760123_zoom_1-1673275660.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: [ 'Rojo', 'Azul', 'Verde' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=28",
+            "https://picsum.photos/1000/1200?random=29",
+            "https://picsum.photos/1000/1200?random=30",
+        ],
         createdAt: '2024-07-02T17:00:00Z'
     },
     {
@@ -172,7 +232,13 @@ export const MockItems = [
         totalSales: 140,
         stock: 0,
         featured: false,
-        image: 'https://serviceapi.spicezgold.com/download/1742462763456_zoom_1-1673275667.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: [ 'Negro', 'Blanco', 'Azul' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=31",
+            "https://picsum.photos/1000/1200?random=32",
+            "https://picsum.photos/1000/1200?random=33",
+        ],
         createdAt: '2024-07-05T19:00:00Z'
     },
     {
@@ -188,7 +254,13 @@ export const MockItems = [
         totalSales: 320,
         stock: 0,
         featured: true,
-        image: 'https://serviceapi.spicezgold.com/download/1742462766789_zoom_1-1673275674.webp',
+        size: [ '40', '41', '42', '43' ],
+        colors: [ 'Rojo', 'Azul', 'Verde' ],
+        images: [
+            "https://picsum.photos/1000/1200?random=34",
+            "https://picsum.photos/1000/1200?random=35", 
+            "https://picsum.photos/1000/1200?random=36",
+        ],
         createdAt: '2024-07-08T21:00:00Z'
     }
 ]

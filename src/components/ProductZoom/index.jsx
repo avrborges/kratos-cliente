@@ -18,7 +18,7 @@ const ProductZoom = ({ images = [] }) => {
 
   return (
     <div className="flex gap-2">
-      <div className="thumbnails flex flex-col gap-4 w-[220px]">
+      <div className="thumbnails flex flex-col gap-4 w-[280px]">
         {safeImages.map((thumbnail, index) => (
           <img
             key={index}

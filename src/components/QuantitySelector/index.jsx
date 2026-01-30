@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 const QuantitySelector = ({ stock, onChange }) => {
@@ -6,29 +5,55 @@ const QuantitySelector = ({ stock, onChange }) => {
 
   const update = (newQty) => {
     setQty(newQty);
-    onChange(newQty);  // ← envía la cantidad al padre
+    onChange(newQty);
   };
 
+  const disabledDecrement = qty <= 1;
+  const disabledIncrement = qty >= stock;
+
   return (
-    <div className="flex items-center gap-3 mt-4">
+    <div className="flex items-center gap-4">
+
+      {/* Botón - */}
       <button
-        className="w-8 h-8 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-40"
         onClick={() => update(Math.max(qty - 1, 1))}
-        disabled={qty <= 1}
+        disabled={disabledDecrement}
+        className={[
+          "w-10 h-10 flex items-center justify-center rounded-full",
+          "bg-white/70 backdrop-blur ring-1 ring-black/5 shadow-sm",
+          "transition-all duration-200",
+          disabledDecrement
+            ? "opacity-40 cursor-not-allowed"
+            : "hover:bg-gray-100 hover:scale-[1.05] cursor-pointer",
+        ].join(" ")}
       >
-        -
+        <span className="text-[20px] font-semibold text-gray-800">−</span>
       </button>
 
-      <div className="w-12 text-center font-bold text-lg">
+      {/* Cantidad */}
+      <div
+        className="
+          min-w-[48px] text-center text-[18px] 
+          font-semibold text-gray-900
+        "
+      >
         {qty}
       </div>
 
+      {/* Botón + */}
       <button
-        className="w-8 h-8 bg-gray-100 border rounded hover:bg-gray-200 disabled:opacity-40"
         onClick={() => update(Math.min(qty + 1, stock))}
-        disabled={qty >= stock}
+        disabled={disabledIncrement}
+        className={[
+          "w-10 h-10 flex items-center justify-center rounded-full",
+          "bg-white/70 backdrop-blur ring-1 ring-black/5 shadow-sm",
+          "transition-all duration-200",
+          disabledIncrement
+            ? "opacity-40 cursor-not-allowed"
+            : "hover:bg-gray-100 hover:scale-[1.05] cursor-pointer",
+        ].join(" ")}
       >
-        +
+        <span className="text-[20px] font-semibold text-gray-800">+</span>
       </button>
     </div>
   );

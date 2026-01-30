@@ -5,6 +5,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import ProductListing from './pages/ProductListing'
 import ProductDetails from './pages/ProductDetails'
+import ScrollToTop from './components/ScrollToTop'
 import { createContext } from 'react'
 
 const AppContext = createContext();
@@ -14,6 +15,7 @@ function App() {
     <>
     <AppContext.Provider>
     <BrowserRouter>
+      <ScrollToTop />
       <Header />
       <Routes>
         <Route path='/' element={<HomePage />} />

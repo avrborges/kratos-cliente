@@ -51,7 +51,7 @@ input { padding: 15px; }
 .swiper-slide {
   text-align: center;
   font-size: 18px;
-  background: #444;
+  background-color: white;
 
   /* Center slide text vertically */
   display: flex;

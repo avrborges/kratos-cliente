@@ -5,11 +5,14 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import ProductListing from './pages/ProductListing'
 import ProductDetails from './pages/ProductDetails'
+import { createContext } from 'react'
 
+const AppContext = createContext();
 function App() {
 
   return (
     <>
+    <AppContext.Provider>
     <BrowserRouter>
       <Header />
       <Routes>
@@ -19,6 +22,7 @@ function App() {
       </Routes>
       <Footer />
     </BrowserRouter>
+    </AppContext.Provider>
     </>
   )
 }

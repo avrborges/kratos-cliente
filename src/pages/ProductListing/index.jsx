@@ -1,20 +1,17 @@
-import React from 'react'
-import { useMemo } from 'react'
-import Sidebar from '../../components/Sidebar'
-import { MockItems } from '../../mocks'
-import ProductItem from '../../components/ProductItem'
-import { Button } from '@mui/material'
+import React, { useMemo, useState } from "react";
+import Sidebar from "../../components/Sidebar";
+import { MockItems } from "../../mocks";
+import ProductItem from "../../components/ProductItem";
+import ProductItemTable from "../../components/ProductItemTable";
+import { Button } from "@mui/material";
 
-//Icons
-import GridViewIcon from '@mui/icons-material/GridView';
-import TableRowsIcon from '@mui/icons-material/TableRows';
-import ProductItemTable from '../../components/ProductItemTable'
+import GridViewIcon from "@mui/icons-material/GridView";
+import TableRowsIcon from "@mui/icons-material/TableRows";
 
 const ProductListing = () => {
+  const [viewMode, setViewMode] = useState("grid");
+  const [sortBy, setSortBy] = useState("default");
 
-  const [viewMode, setViewMode] = React.useState("grid");
-  const [sortBy, setSortBy] = React.useState('default');
-  
   const itemsWithIndex = useMemo(
     () => MockItems.map((it, idx) => ({ ...it, __originalIndex: idx })),
     []
@@ -22,33 +19,24 @@ const ProductListing = () => {
 
   const sortedItems = useMemo(() => {
     const arr = [...itemsWithIndex];
-
-    const toNumber = (v) => (typeof v === 'number' ? v : Number(v ?? 0));
-
-    const getOffer = (it) => {
-      // Elegí qué precio usar para el sort:
-      // return toNumber(it.price);         // si querés ordenar por price
-      return toNumber(it.offerprice);      // ordenar por precio de oferta (recomendado)
-    };
-
+    const toNumber = (v) => (typeof v === "number" ? v : Number(v ?? 0));
+    const getOffer = (it) => toNumber(it.offerprice);
     const getCreated = (it) => new Date(it.createdAt).getTime();
 
     switch (sortBy) {
-      case 'price-asc':
+      case "price-asc":
         arr.sort((a, b) => getOffer(a) - getOffer(b));
         break;
-      case 'price-desc':
+      case "price-desc":
         arr.sort((a, b) => getOffer(b) - getOffer(a));
         break;
-      case 'rating-desc':
+      case "rating-desc":
         arr.sort((a, b) => toNumber(b.rating) - toNumber(a.rating));
         break;
-      case 'newest':
+      case "newest":
         arr.sort((a, b) => getCreated(b) - getCreated(a));
         break;
-      case 'default':
       default:
-        // Volver al orden original
         arr.sort((a, b) => a.__originalIndex - b.__originalIndex);
         break;
     }
@@ -56,100 +44,117 @@ const ProductListing = () => {
     return arr;
   }, [itemsWithIndex, sortBy]);
 
-
-
   return (
-    <section className='bg-white'>
-      
-        <div className="container flex gap-3">
-            <div className="sidebarWrapper w-[20%] h-full bg-white p-3">
-                <h1 className='text-[18px] font-[800] uppercase w-full border-b border-gray-200 pb-3'>
-                  Filtros
-                </h1>
-                <Sidebar />
-            </div>
-            <div className="productsWrapper w-[80%] p-3">
-                <h1 className='text-[18px] font-[800] uppercase w-full border-b border-gray-200 pb-3'>
-                  Productos
-                </h1>
-                <div className="bg-[#f1f1f1] p-2 w-full mb-3 flex items-center justify-between">
-                  <div className=' col1 flex items-center gap-2'>
+    <section className="bg-white py-10">
+      <div className="max-w-[1400px] mx-auto px-4 flex gap-8">
 
-                    <Button
-                      onClick={() => setViewMode("grid")}
-                      className={`
-                        !w-[30px] !h-[30px] !min-w-[30px] rounded-full 
-                        transition-all duration-300 ease-in-out
-                        hover:scale-105
-                        ${viewMode === "grid" 
-                          ? "!bg-gray-300 !text-black shadow-md"
-                          : "!bg-white !text-[#807A79] hover:!bg-gray-200"
-                        }
-                      `}
-                    >
-                      <GridViewIcon 
-                        className={`
-                          !text-[16px] transition-all duration-300 
-                          ${viewMode === "grid" ? "text-black" : "text-[#807A79]"}
-                        `}
-                      />
-                    </Button>
-
-                    <Button
-                      onClick={() => setViewMode("table")}
-                      className={`
-                        !w-[30px] !h-[30px] !min-w-[30px] rounded-full 
-                        transition-all duration-300 ease-in-out
-                        hover:scale-105
-                        ${viewMode === "table"
-                          ? "!bg-gray-300 !text-black shadow-md"
-                          : "!bg-white !text-[#807A79] hover:!bg-gray-200"
-                        }
-                      `}
-                    >
-                      <TableRowsIcon 
-                        className={`
-                          !text-[16px] transition-all duration-300
-                          ${viewMode === "table" ? "text-black" : "text-[#807A79]"}
-                        `}
-                      />
-                    </Button>
-
-                    <div className='text-sm text-gray-600 ml-2'>
-                      Mostrando 1–{sortedItems.length} de {sortedItems.length} resultados
-                    </div>
-                  </div>
-                  <div className='col2 flex items-center'> 
-                    <span className='text-sm text-gray-600 mr-2'>Ordenar por:</span>
-                    <select 
-                      className='p-1 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary bg-white text-sm'
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                    >
-                      <option value="default">Predeterminado</option>
-                      <option value="price-asc">Precio: bajo a alto</option>
-                      <option value="price-desc">Precio: alto a bajo</option>
-                      <option value="rating-desc">Calificación</option>
-                      <option value="newest">Novedades</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className={viewMode === "grid"
-                      ? "grid grid-cols-4 md:grid-cols-4 gap-4 mt-4 mb-12"
-                      : "flex flex-col mt-4 gap-4 mb-12"}>
-                  {sortedItems.map((item) =>
-                    viewMode === "grid" ? (
-                      <ProductItem key={item.id} item={item} />
-                    ) : (
-                      <ProductItemTable key={item.id} item={item} />
-                    )
-                  )}
-                </div>
-            </div>
+        {/* Sidebar */}
+        <div className="w-[23%]">
+          <div className="rounded-xl bg-white ring-1 ring-black/5 shadow-[0_6px_20px_rgba(0,0,0,0.06)] p-5">
+            <h1 className="text-[18px] font-semibold uppercase tracking-tight border-b border-gray-200 pb-3 mb-4">
+              Filtros
+            </h1>
+            <Sidebar />
+          </div>
         </div>
-    </section>
-  )
-}
 
-export default ProductListing
+        {/* Products Area */}
+        <div className="w-[77%]">
+
+          {/* Header */}
+          <div className="rounded-xl bg-white ring-1 ring-black/5 shadow-[0_6px_20px_rgba(0,0,0,0.06)] p-5 mb-6">
+            <h1 className="text-[18px] font-semibold uppercase tracking-tight border-b border-gray-200 pb-3">
+              Productos
+            </h1>
+
+            {/* Toolbar: View mode + Sort */}
+            <div className="mt-4 flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 ring-1 ring-black/5 shadow-sm">
+
+              {/* View Mode Buttons */}
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => setViewMode("grid")}
+                  className="!w-[34px] !h-[34px] !min-w-[34px] rounded-full transition-all duration-300"
+                  sx={{
+                    bgcolor: viewMode === "grid" ? "gray.300" : "white",
+                    border: "1px solid",
+                    borderColor:
+                      viewMode === "grid" ? "gray.400" : "rgba(0,0,0,0.2)",
+                    "&:hover": {
+                      bgcolor: viewMode === "grid" ? "gray.400" : "gray.100",
+                    },
+                  }}
+                >
+                  <GridViewIcon
+                    className={`!text-[16px] ${
+                      viewMode === "grid" ? "text-black" : "text-gray-600"
+                    }`}
+                  />
+                </Button>
+
+                <Button
+                  onClick={() => setViewMode("table")}
+                  className="!w-[34px] !h-[34px] !min-w-[34px] rounded-full transition-all duration-300"
+                  sx={{
+                    bgcolor: viewMode === "table" ? "gray.300" : "white",
+                    border: "1px solid",
+                    borderColor:
+                      viewMode === "table" ? "gray.400" : "rgba(0,0,0,0.2)",
+                    "&:hover": {
+                      bgcolor: viewMode === "table" ? "gray.400" : "gray.100",
+                    },
+                  }}
+                >
+                  <TableRowsIcon
+                    className={`!text-[16px] ${
+                      viewMode === "table" ? "text-black" : "text-gray-600"
+                    }`}
+                  />
+                </Button>
+
+                <div className="text-sm text-gray-600 ml-2">
+                  Mostrando 1–{sortedItems.length} de {sortedItems.length} resultados
+                </div>
+              </div>
+
+              {/* Sort */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Ordenar por:</span>
+                <select
+                  className="p-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="default">Predeterminado</option>
+                  <option value="price-asc">Precio: bajo a alto</option>
+                  <option value="price-desc">Precio: alto a bajo</option>
+                  <option value="rating-desc">Calificación</option>
+                  <option value="newest">Novedades</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Grid / Table */}
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                : "flex flex-col gap-4"
+            }
+          >
+            {sortedItems.map((item) =>
+              viewMode === "grid" ? (
+                <ProductItem key={item.id} item={item} />
+              ) : (
+                <ProductItemTable key={item.id} item={item} />
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ProductListing;

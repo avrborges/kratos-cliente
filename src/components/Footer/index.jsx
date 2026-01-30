@@ -13,35 +13,60 @@ const Footer = () => {
     
     <footer className='pt-8 bg-white'>
         <div className="container">
-            {/* Datos de contacto */}
-            <div className="flex items-center justify-center gap-6 text-center mx-auto w-[100%] pb-12 border-b border-gray-300 ">
-                <div className='col flex items-center justify-center flex-col group w-[30%]'>
-                    <LocalShippingOutlinedIcon className='!text-[40px]'/>
-                    <h3 className='text-[18px] font-bold'>
-                        Envíos a todo el país
-                    </h3>
-                    <p className='text-[14px] font-[300]'>
-                        Para todas las compras realizadas desde el sitio.
-                    </p>
+            {/* Datos de contacto (beneficios superiores) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pb-12 text-center border-b border-gray-200">
+
+            {/* Envíos */}
+            <div className="flex flex-col items-center group transition-all">
+                <div className="w-16 h-16 mb-3 rounded-full bg-white/70 backdrop-blur shadow-md 
+                                ring-1 ring-black/5 flex items-center justify-center 
+                                transition-transform duration-300 group-hover:scale-105">
+                <LocalShippingOutlinedIcon className="!text-[34px] text-gray-700" />
                 </div>
-                <div className='col flex items-center justify-center flex-col group w-[30%]'>
-                    <WalletOutlinedIcon className='!text-[40px]'/>
-                    <h3 className='text-[18px] font-bold'>
-                        Elegí tu método de pago
-                    </h3>
-                    <p className='text-[14px] font-[300]'>
-                        Podés pagar con tarjeta, débito, efectivo o transferencia.
-                    </p>
+
+                <h3 className="text-[18px] font-semibold text-gray-900 tracking-tight">
+                Envíos a todo el país
+                </h3>
+
+                <p className="text-[14px] text-gray-600 max-w-[260px] mt-1">
+                Para todas las compras realizadas desde el sitio.
+                </p>
+            </div>
+
+            {/* Métodos de pago */}
+            <div className="flex flex-col items-center group transition-all">
+                <div className="w-16 h-16 mb-3 rounded-full bg-white/70 backdrop-blur shadow-md 
+                                ring-1 ring-black/5 flex items-center justify-center 
+                                transition-transform duration-300 group-hover:scale-105">
+                <WalletOutlinedIcon className="!text-[34px] text-gray-700" />
                 </div>
-                <div className='col flex items-center justify-center flex-col group w-[30%]'>
-                    <ShieldOutlinedIcon className='!text-[40px]'/>
-                    <h3 className='text-[18px] font-bold'>
-                        Tu compra es segura
-                    </h3>
-                    <p className='text-[14px] font-[300]'>
-                        Todos los productos son enviados con seguridad y con garantía de calidad.
-                    </p>
+
+                <h3 className="text-[18px] font-semibold text-gray-900 tracking-tight">
+                Elegí tu método de pago
+                </h3>
+
+                <p className="text-[14px] text-gray-600 max-w-[260px] mt-1">
+                Podés pagar con tarjeta, débito, efectivo o transferencia.
+                </p>
+            </div>
+
+            {/* Compra segura */}
+            <div className="flex flex-col items-center group transition-all">
+                <div className="w-16 h-16 mb-3 rounded-full bg-white/70 backdrop-blur shadow-md 
+                                ring-1 ring-black/5 flex items-center justify-center 
+                                transition-transform duration-300 group-hover:scale-105">
+                <ShieldOutlinedIcon className="!text-[34px] text-gray-700" />
                 </div>
+
+                <h3 className="text-[18px] font-semibold text-gray-900 tracking-tight">
+                Tu compra es segura
+                </h3>
+
+                <p className="text-[14px] text-gray-600 max-w-[260px] mt-1">
+                Todos los productos son enviados con seguridad y garantía de calidad.
+                </p>
+            </div>
+
             </div>
 
             <div className="flex mt-5 gap-8 items-center justify-between">
@@ -127,8 +152,6 @@ const Footer = () => {
             </div>
         </div>
     </footer>
-    
-
 )
 }
 

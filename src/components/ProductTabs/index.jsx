@@ -3,6 +3,16 @@ import { useState } from "react";
 import { MockComentarios } from "../../mocks";
 import { Rating, Button } from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
+// Tabla
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 const ProductTabs = ({ item }) => {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -46,7 +56,7 @@ const ProductTabs = ({ item }) => {
           }`}
           onClick={() => setActiveTab(2)}
         >
-          Reviews
+          Reviews ({comentariosProducto.length})
         </span>
       </div>
 
@@ -72,9 +82,74 @@ const ProductTabs = ({ item }) => {
           shadow-[0_4px_20px_rgba(0,0,0,0.06)]
           space-y-6
         ">
-          <p className="text-[14px] text-gray-700">
-            Acá podés agregar detalles técnicos del producto.
-          </p>
+            <TableContainer>
+                <Table aria-label="Detalles del producto">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                Categoría
+                            </TableCell>
+                            <TableCell>{item.category}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                Marca
+                            </TableCell>
+                            <TableCell>{item.brand}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                SKU
+                            </TableCell>
+                            <TableCell>{item.sku}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                Precio original
+                            </TableCell>
+                            <TableCell>{item.price}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                Precio con descuento
+                            </TableCell>
+                            <TableCell>{item.offerprice}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                Stock Disponible
+                            </TableCell>
+                            <TableCell>
+                                {item.stock > 0 ? `${item.stock} unidades` : "Sin stock"}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                Colores disponibles
+                            </TableCell>
+                            <TableCell>
+                                {item?.stock === 0
+                                ? "Sin stock"
+                                : Array.isArray(item?.colors) && item.colors.length > 0
+                                    ? item.colors.map(c => c.name).join(", ")
+                                    : "No hay colores disponibles"}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell component="th" scope="row" className="font-semibold">
+                                Talles disponibles
+                            </TableCell>
+                            <TableCell>
+                                {item?.stock === 0
+                                ? "Sin stock"
+                                : Array.isArray(item?.sizes) && item.sizes.length > 0
+                                    ? item.sizes.map(s => s.name).join(", ")
+                                    : "No hay talles disponibles"}
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
       )}
 

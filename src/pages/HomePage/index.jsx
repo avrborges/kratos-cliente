@@ -50,6 +50,7 @@ const HomePage = () => {
         return new Date(b.createdAt) - new Date(a.createdAt);
       })
       .filter(item => Number(item.stock) > 0) // solo con stock
+
       .slice(0, 5);
   }, [value]);
 

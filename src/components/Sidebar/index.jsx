@@ -1,24 +1,56 @@
-import React from 'react'
-// Mock Data
-import { MockCategories } from '../../mocks'
-import { MockFiltros } from '../../mocks';
-// Checkbox
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import { Box, Tooltip } from '@mui/material';
-// Iconos
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-//Librerias
-import {Collapse} from 'react-collapse';
-import Button from '@mui/material/Button';
-import Rating from '@mui/material/Rating';
-import RangeSlider from 'react-range-slider-input';
-import 'react-range-slider-input/dist/style.css';
+import React from "react";
+import { MockCategories } from "../../mocks";
+import { MockFiltros } from "../../mocks";
 
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import { Box, Tooltip } from "@mui/material";
+
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+
+import { Collapse } from "react-collapse";
+import Button from "@mui/material/Button";
+import Rating from "@mui/material/Rating";
+import RangeSlider from "react-range-slider-input";
+import "react-range-slider-input/dist/style.css";
+
+/* ---------------- Color Dot Component ---------------- */
+const ColorDot = ({ color }) => (
+  <Box
+    component="span"
+    sx={(theme) => ({
+      width: 18,
+      height: 18,
+      borderRadius: "50%",
+      bgcolor: color,
+      border: "1px solid",
+      borderColor:
+        theme.palette.mode === "dark" ? "grey.700" : "grey.300",
+      display: "inline-block",
+    })}
+  />
+);
+
+const CheckedDot = ({ color }) => (
+  <Box sx={{ position: "relative", lineHeight: 0 }}>
+    <ColorDot color={color} />
+    <Box
+      sx={{
+        position: "absolute",
+        inset: -2,
+        borderRadius: "50%",
+        border: "2px solid",
+        borderColor: "primary.main",
+        pointerEvents: "none",
+      }}
+    />
+  </Box>
+);
+
+/* ---------------- Sidebar Component ---------------- */
 const Sidebar = () => {
-
   const [isOpenCategories, setIsOpenCategories] = React.useState(true);
   const [isOpenStock, setIsOpenStock] = React.useState(true);
   const [isOpenTalle, setIsOpenTalle] = React.useState(true);
@@ -26,343 +58,204 @@ const Sidebar = () => {
   const [isOpenPrecio, setIsOpenPrecio] = React.useState(true);
   const [isOpenRating, setIsOpenRating] = React.useState(true);
 
-  
-// Componente “punto de color”
-const ColorDot = ({ color }) => (
-  <Box
-    component="span"
-    sx={(theme) => ({
-      width: 16,
-      height: 16,
-      borderRadius: '50%',
-      bgcolor: color,
-      // Borde visible también para colores claros (e.g., blanco)
-      border: '1px solid',
-      borderColor: theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300',
-      display: 'inline-block',
-    })}
-  />
-);
-
-// Versión con aro cuando está seleccionado
-const CheckedDot = ({ color }) => (
-  <Box sx={{ position: 'relative', lineHeight: 0 }}>
-    <ColorDot color={color} />
-    <Box
-      sx={{
-        position: 'absolute',
-        inset: -2, // aro alrededor
-        borderRadius: '50%',
-        border: '2px solid',
-        borderColor: 'primary.main',
-        pointerEvents: 'none',
-      }}
-    />
-  </Box>
-);
-
+  /* ---------------- Header Title Component ---------------- */
+  const SectionTitle = ({ title, isOpen, toggle }) => (
+    <h3 className="mb-2 text-[16px] font-semibold flex items-center justify-between pr-3 text-gray-900">
+      {title}
+      <Button
+        onClick={toggle}
+        className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full"
+        sx={{
+          borderRadius: "50%",
+          minWidth: 30,
+          width: 30,
+          height: 30,
+          padding: 0,
+          color: "#111",
+          "&:hover": {
+            backgroundColor: "rgba(0,0,0,0.08)",
+          },
+        }}
+      >
+        {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+      </Button>
+    </h3>
+  );
 
   return (
-    <aside className='sidebar py-1'>
-        {/* Filtro por categoría */}
-        <div className="box mb-2 mt-2">
-            <h3 className="mb-1 text-[16px] font-[600] flex items-center justify-between pr-3">
-                Categorías
-                <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full text-[12px] !text-[#000] font-[500]" onClick={() => setIsOpenCategories(!isOpenCategories) }>
-                    {
-                        isOpenCategories ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>
-                    }
-                </Button>
-            </h3>
-            <Collapse isOpened={isOpenCategories}>
-              <div className="scroll max-h-[250px] overflow-y-scroll overflow-x-hidden px-3 relative -left-[15px]">
-                <FormGroup>
-                  {MockCategories.map((category, index) => (
-                    <FormControlLabel
-                      key={index}
-                      className="w-full"
-                      label={category.name}
-                      sx={{
-                        m: 0,
-                        '& .MuiFormControlLabel-label': { 
-                          fontSize: 14, 
-                          lineHeight: 1.3 
-                        },
-                        gap: 0.7,
-                      }}
-                      control={
-                        <Checkbox
-                          checked={category.checked}
-                          onChange={() => {}}
-                          size="small"
-                          sx={{
-                            p: 0.5,
-                            '& .MuiSvgIcon-root': { fontSize: 18 },
-                          }}
-                        />
-                      }
-                    />
-                  ))}
-                </FormGroup>
-              </div>
-            </Collapse>
-        </div>
-        {/* Filtro por stock */}
-        <div className="box mb-2">
-            <h3 className="mb-1 text-[16px] font-[600] flex items-center justify-between pr-3">
-                En Stock
-                <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full text-[12px] !text-[#000] font-[500]" onClick={() => setIsOpenStock(!isOpenStock) }>
-                    {
-                        isOpenStock ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>
-                    }
-                </Button>
-            </h3>
-            <Collapse isOpened={isOpenStock}>
-              <div className="scroll max-h-[250px] overflow-y-scroll overflow-x-hidden px-3 relative -left-[15px]">
-                <FormGroup>
-                  {MockFiltros.stocks.map((stock) => (
-                    <FormControlLabel
-                      key={stock.id}
-                      className="w-full"
-                      label={stock.label}
-                      sx={{
-                        m: 0,
-                        '& .MuiFormControlLabel-label': { 
-                          fontSize: 14,
-                          lineHeight: 1.3
-                        },
-                        gap: 0.7,
-                      }}
-                      control={
-                        <Checkbox
-                          checked={stock.checked}
-                          onChange={() => {}}
-                          size="small"
-                          sx={{
-                            p: 0.5,
-                            '& .MuiSvgIcon-root': { fontSize: 18 },
-                          }}
-                        />
-                      }
-                    />
-                  ))}
-                </FormGroup>
-              </div>
-            </Collapse>
-        </div>
-        {/* Filtro por talle */}
-        <div className="box mb-2">
-            <h3 className="mb-1 text-[16px] font-[600] flex items-center justify-between pr-3">
-                Talles
-                <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full text-[12px] !text-[#000] font-[500]" onClick={() => setIsOpenTalle(!isOpenTalle) }>
-                    {
-                        isOpenTalle ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>
-                    }
-                </Button>
-            </h3>
-            <Collapse isOpened={isOpenTalle}>
-              <div className="scroll max-h-[250px] overflow-y-scroll overflow-x-hidden px-3 relative -left-[15px]">
-                <FormGroup
+    <aside className="sidebar space-y-5">
+
+      {/* ✦ Categorías */}
+      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+        <SectionTitle
+          title="Categorías"
+          isOpen={isOpenCategories}
+          toggle={() => setIsOpenCategories(!isOpenCategories)}
+        />
+
+        <Collapse isOpened={isOpenCategories}>
+          <div className="max-h-[240px] overflow-y-auto pr-1">
+            <FormGroup>
+              {MockCategories.map((category, i) => (
+                <FormControlLabel
+                  key={i}
+                  label={category.name}
                   sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                    columnGap: 2,  // theme.spacing(2)
-                    rowGap: 0.25,   // theme.spacing(1.5)
+                    "& .MuiFormControlLabel-label": {
+                      fontSize: 14,
+                      color: "gray.800",
+                    },
                   }}
-                >
-                  {MockFiltros.sizes.map((size) => (
-                    <FormControlLabel
-                      key={size.id}
-                      sx={{
-                        m: 0,
-                        width: '100%',
-                        '& .MuiFormControlLabel-label': { fontSize: 14, lineHeight: 1.3 },
-                        gap: 0.7,
-                      }}
-                      label={size.label}
-                      control={
-                        <Checkbox
-                          checked={size.checked}
-                          onChange={() => {}}
-                          size="small"
-                          sx={{ p: 0.5, '& .MuiSvgIcon-root': { fontSize: 18 } }}
-                        />
-                      }
-                    />
-                  ))}
-                </FormGroup>
-              </div>
-            </Collapse>
-        </div>
-        {/* Filtro por color */}
-        <div className="box mb-2">
-          <h3 className="mb-1 text-[16px] font-[600] flex items-center justify-between pr-3">
-            Colores
-            <Button
-              className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full text-[12px] !text-[#000] font-[500]"
-              onClick={() => setIsOpenColor(!isOpenColor)}
+                  control={
+                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
+                  }
+                />
+              ))}
+            </FormGroup>
+          </div>
+        </Collapse>
+      </div>
+
+      {/* ✦ Stock */}
+      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+        <SectionTitle
+          title="En stock"
+          isOpen={isOpenStock}
+          toggle={() => setIsOpenStock(!isOpenStock)}
+        />
+
+        <Collapse isOpened={isOpenStock}>
+          <div className="max-h-[240px] overflow-y-auto pr-1">
+            <FormGroup>
+              {MockFiltros.stocks.map((stock) => (
+                <FormControlLabel
+                  key={stock.id}
+                  label={stock.label}
+                  sx={{
+                    "& .MuiFormControlLabel-label": {
+                      fontSize: 14,
+                      color: "gray.800",
+                    },
+                  }}
+                  control={
+                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
+                  }
+                />
+              ))}
+            </FormGroup>
+          </div>
+        </Collapse>
+      </div>
+
+      {/* ✦ Talles */}
+      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+        <SectionTitle
+          title="Talles"
+          isOpen={isOpenTalle}
+          toggle={() => setIsOpenTalle(!isOpenTalle)}
+        />
+
+        <Collapse isOpened={isOpenTalle}>
+          <div className="max-h-[240px] overflow-y-auto pr-1">
+            <FormGroup
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: 1,
+              }}
             >
-              {isOpenColor ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
-            </Button>
-          </h3>
+              {MockFiltros.sizes.map((size) => (
+                <FormControlLabel
+                  key={size.id}
+                  label={size.label}
+                  sx={{
+                    "& .MuiFormControlLabel-label": { fontSize: 14, color: "gray.800" },
+                  }}
+                  control={
+                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
+                  }
+                />
+              ))}
+            </FormGroup>
+          </div>
+        </Collapse>
+      </div>
 
-          <Collapse isOpened={isOpenColor}>
-            <div className="scroll max-h-[250px] overflow-y-scroll overflow-x-hidden px-3 relative -left-[15px]">
+      {/* ✦ Colores */}
+      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+        <SectionTitle
+          title="Colores"
+          isOpen={isOpenColor}
+          toggle={() => setIsOpenColor(!isOpenColor)}
+        />
 
-              <FormGroup row sx={{ gap: 1, flexWrap: "wrap" }}>
-                {MockFiltros.colors.map((color) => (
-                  <FormControlLabel
-                    key={color.id}
-                    // 🔹 Eliminamos w-full → permite alinear horizontal
-                    className=""
-                    label={
-                      <Tooltip title={color.label} enterDelay={300}>
-                        <span style={{ display: "inline-block", width: 0, height: 0 }} />
-                      </Tooltip>
-                    }
-                    sx={{
-                      m: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      '& .MuiFormControlLabel-label': {
-                        fontSize: 0,
-                        lineHeight: 0,
-                      },
-                    }}
-                    control={
-                      <Checkbox
-                        checked={color.checked}
-                        onChange={() => {}}
-                        size="small"
-                        icon={
-                          <Box
-                            sx={(theme) => ({
-                              width: 18,
-                              height: 18,
-                              borderRadius: "50%",
-                              bgcolor: color.hex,
-                              border: "1px solid",
-                              borderColor:
-                                theme.palette.mode === "dark"
-                                  ? "grey.700"
-                                  : "grey.300",
-                            })}
-                          />
-                        }
-                        checkedIcon={
-                          <Box sx={{ position: "relative" }}>
-                            <Box
-                              sx={(theme) => ({
-                                width: 18,
-                                height: 18,
-                                borderRadius: "50%",
-                                bgcolor: color.hex,
-                                border: "1px solid",
-                                borderColor:
-                                  theme.palette.mode === "dark"
-                                    ? "grey.700"
-                                    : "grey.300",
-                              })}
-                            />
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                inset: -2,
-                                borderRadius: "50%",
-                                border: "2px solid",
-                                borderColor: "primary.main",
-                                pointerEvents: "none",
-                              }}
-                            />
-                          </Box>
-                        }
-                        inputProps={{ "aria-label": color.label }}
-                        sx={{ p: 0.5 }}
-                      />
-                    }
+        <Collapse isOpened={isOpenColor}>
+          <div className="flex flex-wrap gap-3 mt-2 pr-1">
+            {MockFiltros.colors.map((color) => (
+              <FormControlLabel
+                key={color.id}
+                label=""
+                control={
+                  <Checkbox
+                    icon={<ColorDot color={color.hex} />}
+                    checkedIcon={<CheckedDot color={color.hex} />}
+                    sx={{ p: 0.4 }}
                   />
-                ))}
-              </FormGroup>
+                }
+              />
+            ))}
+          </div>
+        </Collapse>
+      </div>
 
+      {/* ✦ Precios */}
+      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+        <SectionTitle
+          title="Precio"
+          isOpen={isOpenPrecio}
+          toggle={() => setIsOpenPrecio(!isOpenPrecio)}
+        />
+
+        <Collapse isOpened={isOpenPrecio}>
+          <div className="w-full mt-3">
+            <RangeSlider min={100} max={50000} />
+            <div className="flex justify-between text-[13px] mt-4 text-gray-700">
+              <span>Desde: <strong>$100</strong></span>
+              <span>Hasta: <strong>$50.000</strong></span>
             </div>
-          </Collapse>
-        </div>
-        {/* Filtro por precios */}
-        <div className="box mb-2">
-            <h3 className="mb-4 text-[16px] font-[600] flex items-center justify-between pr-3">
-                Precios
-                <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full text-[12px] !text-[#000] font-[500]" onClick={() => setIsOpenPrecio(!isOpenPrecio) }>
-                    {
-                        isOpenPrecio ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>
-                    }
-                </Button>
-            </h3>
-            <Collapse isOpened={isOpenPrecio}>
-                <div className='w-[90%]'>
-                <RangeSlider />
-                <div className="flex pt-4 pb-2 priceRange text-[13px] font-[500]">
-                  <span>
-                    Desde: <strong className='text-dark'>${100}</strong>
-                  </span>
-                  <span className='ml-auto'>
-                    Hasta: <strong className='text-dark'>${50000}</strong>
-                  </span>
-                </div>
-                </div>
-            </Collapse>
-        </div>
-        {/* Filtro por rating */}
-        <div className="box mb-2">
-            <h3 className="mb-1 text-[16px] font-[600] flex items-center justify-between pr-3">
-                Rating
-                <Button className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full text-[12px] !text-[#000] font-[500]" onClick={() => setIsOpenRating(!isOpenRating) }>
-                    {
-                        isOpenRating ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>
-                    }
-                </Button>
-            </h3>
-            <Collapse isOpened={isOpenRating}>
-              <div className="scroll max-h-[250px] overflow-y-scroll overflow-x-hidden px-3 relative -left-[15px]">
-                  <FormGroup>
-                    {MockFiltros.rating.map((rate) => (
-                      <FormControlLabel
-                        key={rate.id}
-                        className="w-full"
-                        sx={{
-                          m: 0,
-                          '& .MuiFormControlLabel-label': { 
-                            fontSize: 14, 
-                            lineHeight: 1.3,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px'
-                          },
-                          gap: 0.7,
-                        }}
-                        label={
-                          <div className="flex items-center gap-1">
-                            <Rating name="rating" value={rate.value} readOnly />
-                          </div>
-                        }
-                        control={
-                          <Checkbox
-                            checked={rate.checked}
-                            onChange={() => {}}
-                            size="small"
-                            sx={{
-                              p: 0.5,
-                              '& .MuiSvgIcon-root': { fontSize: 18 },
-                            }}
-                          />
-                        }
-                      />
-                    ))}
-                  </FormGroup>
-              </div>
-            </Collapse>
-        </div> 
-    </aside>
-  )
-}
+          </div>
+        </Collapse>
+      </div>
 
-export default Sidebar
+      {/* ✦ Rating */}
+      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+        <SectionTitle
+          title="Rating"
+          isOpen={isOpenRating}
+          toggle={() => setIsOpenRating(!isOpenRating)}
+        />
+
+        <Collapse isOpened={isOpenRating}>
+          <div className="max-h-[240px] overflow-y-auto pr-1">
+            <FormGroup>
+              {MockFiltros.rating.map((rate) => (
+                <FormControlLabel
+                  key={rate.id}
+                  label={<Rating value={rate.value} readOnly size="small" />}
+                  sx={{
+                    "& .MuiFormControlLabel-label": { fontSize: 14, color: "gray.800" },
+                  }}
+                  control={
+                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
+                  }
+                />
+              ))}
+            </FormGroup>
+          </div>
+        </Collapse>
+      </div>
+    </aside>
+  );
+};
+
+export default Sidebar;

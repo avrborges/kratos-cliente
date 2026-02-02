@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import Search from "../Search";
 import Navigation from "./Navigation";
+import CartDrawer from "../CartDrawer";
+import WishlistDrawer from "../WishlistDrawer";
 
 import Badge from "@mui/material/Badge";
 import IconButton from "@mui/material/IconButton";
@@ -15,6 +18,10 @@ import { AiFillInstagram, AiFillTwitterCircle } from "react-icons/ai";
 import logo from "../../assets/DRAKOS.png";
 
 const Header = () => {
+
+  const [cartOpen, setCartOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
+
   return (
     <header className="w-full bg-white shadow-sm ring-1 ring-black/5">
 
@@ -81,13 +88,13 @@ const Header = () => {
             <div className="absolute left-1/2 -translate-x-1/2">
               <ul className="flex items-center gap-2 text-[14px] text-gray-700">
                 <li>
-                  <Link to="/" className="hover:text-gray-500 transition font-medium">
+                  <Link to="/login" className="hover:text-gray-500 transition font-medium">
                     Login
                   </Link>
                 </li>
                 <li className="text-gray-300">|</li>
                 <li>
-                  <Link to="/" className="hover:text-gray-500 transition font-medium">
+                  <Link to="/registro" className="hover:text-gray-500 transition font-medium">
                     Registro
                   </Link>
                 </li>
@@ -101,6 +108,7 @@ const Header = () => {
               <Tooltip title="Favoritos">
                 <IconButton
                   size="small"
+                  onClick={() => setWishlistOpen(true)}
                   sx={{
                     bgcolor: "white",
                     boxShadow: "0 2px 6px rgba(0,0,0,0.10)",
@@ -118,6 +126,7 @@ const Header = () => {
               <Tooltip title="Carrito de Compras">
                 <IconButton
                   size="small"
+                  onClick={() => setCartOpen(true)}
                   sx={{
                     bgcolor: "white",
                     boxShadow: "0 2px 6px rgba(0,0,0,0.10)",
@@ -138,6 +147,8 @@ const Header = () => {
 
       {/* ========================= NAVIGATION ========================= */}
       <Navigation />
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <WishlistDrawer open={wishlistOpen} onClose={() => setWishlistOpen(false)} />
     </header>
   );
 };

@@ -6,6 +6,8 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import ShareIcon from "@mui/icons-material/Share";
 import { Link, useNavigate } from "react-router-dom";
+// ⬇️ Si ya tenés un AuthContext:
+import { useAuth } from "../../context/AuthContext";
 
 /* ---------- Helpers ---------- */
 const isNew = (date) => {
@@ -28,8 +30,11 @@ const ProductItemTable = ({
   onQuickView = () => {},
   onWishlist = () => {},
   onShare = () => {},
+  // Si preferís pasar el login por prop, descomentá la línea siguiente y borrá el useAuth
+  // isLoggedIn = false,
 }) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth?.() || { isLoggedIn: false }; // fallback seguro si no tenés hook
 
   const showNew = isNew(item?.createdAt);
   const showDiscount = Number(item?.discount) > 0;
@@ -154,7 +159,8 @@ const ProductItemTable = ({
 
           {/* Acciones (consistencia de alto con botones circulares) */}
           <div className="flex gap-2 self-end">
-            <Tooltip title="Vista rápida" arrow>
+            {/* Vista rápida */}
+            <Tooltip title="Ver detalles" arrow>
               <Button
                 variant="contained"
                 size="small"
@@ -183,31 +189,50 @@ const ProductItemTable = ({
               </Button>
             </Tooltip>
 
-            <Tooltip title="Favorito" arrow>
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => onWishlist(item)}
-                sx={{
-                  minWidth: 40,
-                  width: 40,
-                  height: 40,
-                  p: 0,
-                  borderRadius: "9999px",
-                  bgcolor: "rgba(255,255,255,0.85)",
-                  color: "text.primary",
-                  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
-                  backdropFilter: "blur(6px)",
-                  "&:hover": {
-                    bgcolor: "rgba(243,244,246,0.95)",
-                    transform: "translateY(-1px)",
-                  },
-                }}
-              >
-                <FavoriteBorderIcon fontSize="small" />
-              </Button>
+            {/* Favorito (bloquear si no hay login) */}
+            <Tooltip
+              title={
+                !isLoggedIn
+                  ? "Iniciá sesión para agregar a favoritos"
+                  : "Agregar a favoritos"
+              }
+              arrow
+            >
+              {/* Wrapper <span> para que el Tooltip funcione con disabled */}
+              <span>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    if (!isLoggedIn) return;
+                    onWishlist(item);
+                  }}
+                  disabled={!isLoggedIn}
+                  sx={{
+                    minWidth: 40,
+                    width: 40,
+                    height: 40,
+                    p: 0,
+                    borderRadius: "9999px",
+                    bgcolor: "rgba(255,255,255,0.85)",
+                    color: "text.primary",
+                    boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+                    backdropFilter: "blur(6px)",
+                    opacity: !isLoggedIn ? 0.5 : 1,
+                    "&:hover": {
+                      bgcolor: !isLoggedIn
+                        ? "rgba(255,255,255,0.85)"
+                        : "rgba(243,244,246,0.95)",
+                      transform: !isLoggedIn ? "none" : "translateY(-1px)",
+                    },
+                  }}
+                >
+                  <FavoriteBorderIcon fontSize="small" />
+                </Button>
+              </span>
             </Tooltip>
 
+            {/* Compartir (siempre habilitado) */}
             <Tooltip title="Compartir" arrow>
               <Button
                 variant="contained"
@@ -237,27 +262,51 @@ const ProductItemTable = ({
 
         {/* CTA: botón minimalista, siempre en la misma posición */}
         <div className="mt-3">
-          <Button
-            variant="outlined"
-            fullWidth
-            onClick={() => onAddToCart(item)}
-            disabled={isOutOfStock}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              borderRadius: 2,
-              height: 40,
-              borderColor: "grey.300",
-              color: isOutOfStock ? "text.disabled" : "text.primary",
-              bgcolor: "transparent",
-              boxShadow: "none",
-              "&:hover": isOutOfStock
-                ? {}
-                : { borderColor: "grey.400", bgcolor: "rgba(0,0,0,0.02)" },
-            }}
+          <Tooltip
+            arrow
+            title={
+              !isLoggedIn
+                ? "Iniciá sesión para agregar productos al carrito"
+                : isOutOfStock
+                ? "Sin stock"
+                : "Agregar al carrito"
+            }
           >
-            {isOutOfStock ? "Sin stock" : "Agregar al carrito"}
-          </Button>
+            <span>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => {
+                  if (!isLoggedIn) return;
+                  if (isOutOfStock) return;
+                  onAddToCart(item);
+                }}
+                disabled={!isLoggedIn || isOutOfStock}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  height: 40,
+                  borderColor: "grey.300",
+                  color:
+                    !isLoggedIn || isOutOfStock ? "text.disabled" : "text.primary",
+                  bgcolor: "transparent",
+                  boxShadow: "none",
+                  opacity: !isLoggedIn ? 0.5 : 1,
+                  "&:hover":
+                    !isLoggedIn || isOutOfStock
+                      ? {}
+                      : { borderColor: "grey.400", bgcolor: "rgba(0,0,0,0.02)" },
+                }}
+              >
+                {!isLoggedIn
+                  ? "Iniciá sesión"
+                  : isOutOfStock
+                  ? "Sin stock"
+                  : "Agregar al carrito"}
+              </Button>
+            </span>
+          </Tooltip>
         </div>
       </div>
     </div>

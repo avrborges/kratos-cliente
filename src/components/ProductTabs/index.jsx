@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MockComentarios } from "../../mocks";
 import { Rating, Button } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Tooltip from "@mui/material/Tooltip";
 
 // Tabla
 import Table from "@mui/material/Table";
@@ -10,8 +11,12 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 
+// Context
+import { useAuth } from "../../context/AuthContext";
+
 const ProductTabs = ({ item }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const { isLoggedIn } = useAuth();
 
   // Form review
   const [rating, setRating] = useState(0);
@@ -193,91 +198,109 @@ const ProductTabs = ({ item }) => {
               Agregar una review
             </h4>
 
-            {/* Rating */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[14px] font-medium text-gray-700">
-                Calificación <span className="text-red-500">*</span>
-              </label>
-
-              <Rating
-                value={rating}
-                precision={0.5}
-                size="large"
-                onChange={(e, val) => setRating(val)}
-              />
-
-              {ratingError && (
-                <span className="text-sm text-red-500">
-                  La calificación es obligatoria.
-                </span>
-              )}
-            </div>
-
-            {/* Comentario */}
-            <div className="flex flex-col gap-1 mt-4">
-              <label className="text-[14px] font-medium text-gray-700">
-                Comentario <span className="text-red-500">*</span>
-              </label>
-
-              <textarea
-                rows={4}
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className={`
-                  border rounded-lg px-3 py-2 w-full text-[14px]
-                  transition-all resize-none
-                  focus:outline-none focus:ring-2
-                  ${
-                    commentError && comment !== ""
-                      ? "border-red-500 ring-red-300"
-                      : "border-gray-300 ring-black/10 focus:ring-black/20"
-                  }
-                `}
-              />
-
-              {commentError && comment !== "" && (
-                <span className="text-sm text-red-500">
-                  El comentario es obligatorio.
-                </span>
-              )}
-            </div>
-
-            {/* Botón */}
-            <Button
-              variant="contained"
-              disabled={ratingError || commentError}
-              onClick={() =>
-                console.log("REVIEW ENVIADA:", {
-                  idProducto: item.id,
-                  rating,
-                  comentario: comment,
-                })
+            <Tooltip
+              arrow
+              title={
+                !isLoggedIn
+                  ? "Iniciá sesión para dejar una review"
+                  : "Completá los campos obligatorios"
               }
-              sx={{
-                mt: 3,
-                textTransform: "none",
-                fontWeight: 700,
-                fontSize: "15px",
-                borderRadius: "10px",
-                px: 3,
-                py: 1.5,
-                bgcolor:
-                  ratingError || commentError ? "grey.300" : "black",
-                color:
-                  ratingError || commentError ? "text.disabled" : "white",
-                boxShadow:
-                  ratingError || commentError
-                    ? "none"
-                    : "0 8px 20px rgba(0,0,0,0.25)",
-                "&:hover":
-                  ratingError || commentError
-                    ? {}
-                    : { bgcolor: "grey.900", transform: "translateY(-1px)" },
-              }}
             >
-              Enviar review
-            </Button>
+              <div className={`${!isLoggedIn ? "opacity-50 pointer-events-none" : ""}`}>
+                {/* Rating */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[14px] font-medium text-gray-700">
+                    Calificación <span className="text-red-500">*</span>
+                  </label>
+
+                  <Rating
+                    value={rating}
+                    precision={0.5}
+                    size="large"
+                    onChange={(e, val) => setRating(val)}
+                    disabled={!isLoggedIn}
+                  />
+
+                  {ratingError && (
+                    <span className="text-sm text-red-500">
+                      La calificación es obligatoria.
+                    </span>
+                  )}
+                </div>
+
+                {/* Comentario */}
+                <div className="flex flex-col gap-1 mt-4">
+                  <label className="text-[14px] font-medium text-gray-700">
+                    Comentario <span className="text-red-500">*</span>
+                  </label>
+
+                  <textarea
+                    rows={4}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    disabled={!isLoggedIn}
+                    className={`
+                      border rounded-lg px-3 py-2 w-full text-[14px]
+                      transition-all resize-none
+                      focus:outline-none focus:ring-2
+                      ${
+                        commentError && comment !== ""
+                          ? "border-red-500 ring-red-300"
+                          : "border-gray-300 ring-black/10 focus:ring-black/20"
+                      }
+                    `}
+                  />
+
+                  {commentError && comment !== "" && (
+                    <span className="text-sm text-red-500">
+                      El comentario es obligatorio.
+                    </span>
+                  )}
+                </div>
+
+                {/* Botón */}
+                <Button
+                  variant="contained"
+                  disabled={!isLoggedIn || ratingError || commentError}
+                  onClick={() => {
+                    if (!isLoggedIn) return;
+                    console.log("REVIEW ENVIADA:", {
+                      idProducto: item.id,
+                      rating,
+                      comentario: comment,
+                    });
+                  }}
+                  sx={{
+                    mt: 3,
+                    textTransform: "none",
+                    fontWeight: 700,
+                    fontSize: "15px",
+                    borderRadius: "10px",
+                    px: 3,
+                    py: 1.5,
+                    bgcolor:
+                      !isLoggedIn || ratingError || commentError ? "grey.300" : "black",
+                    color:
+                      !isLoggedIn || ratingError || commentError
+                        ? "text.disabled"
+                        : "white",
+                    boxShadow:
+                      !isLoggedIn || ratingError || commentError
+                        ? "none"
+                        : "0 8px 20px rgba(0,0,0,0.25)",
+                    "&:hover":
+                      !isLoggedIn || ratingError || commentError
+                        ? {}
+                        : { bgcolor: "grey.900", transform: "translateY(-1px)" },
+                  }}
+                  fullWidth
+                >
+                  {!isLoggedIn ? "Iniciá sesión" : "Enviar review"}
+                </Button>
+              </div>
+            </Tooltip>
           </div>
+
         </div>
       )}
     </>

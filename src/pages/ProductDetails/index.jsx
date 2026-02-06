@@ -1,9 +1,17 @@
 import React, { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Button, Rating, Chip } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareIcon from "@mui/icons-material/Share";
+import CheckIcon from "@mui/icons-material/Check";
 import ProductZoom from "../../components/ProductZoom";
 import ProductTabs from "../../components/ProductTabs";
 import QuantitySelector from "../../components/QuantitySelector";
+// Context
+import { useWishlist } from "../../context/WishlistContext";
+import { useAuth } from "../../context/AuthContext";
 
 /* -------- Helpers -------- */
 const currencyAR = (n) =>
@@ -13,11 +21,28 @@ const currencyAR = (n) =>
 
 const ProductDetails = () => {
   const { state } = useLocation();
-  const item = state; // se espera que venga desde ProductListing/ProductItem
+  const item = state; // se espera que venga desde ProductListing/ProductItem o WishlistDrawer
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
+
+  // ---- Wishlist ----
+  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const isFavorite =
+    !!item && Array.isArray(wishlist) && wishlist.some((w) => w.id === item.id);
+
+  // Auth
+  const { isLoggedIn } = useAuth();
+
+  const handleToggleFavorite = () => {
+    if (!item) return;
+    if (isFavorite) {
+      removeFromWishlist(item.id);
+    } else {
+      addToWishlist(item);
+    }
+  };
 
   const isOutOfStock = Number(item?.stock) === 0;
   const lowStock = Number(item?.stock) > 0 && Number(item?.stock) <= 5;
@@ -32,6 +57,7 @@ const ProductDetails = () => {
 
   // Manejar agregar al carrito
   const handleAddToCart = () => {
+    if (!item) return;
     const productToCart = {
       id: item.id,
       name: item.name,
@@ -43,6 +69,46 @@ const ProductDetails = () => {
     };
     console.log("AGREGADO AL CARRITO:", productToCart);
   };
+
+  // /* ========== Compartir (Web Share API + Fallback) ========== */
+  // const [copied, setCopied] = useState(false);
+
+  // const buildShareData = () => {
+  //   // armamos título/texto y URL del producto
+  //   const url = window.location.origin + `/productdetails/${item?.id}`;
+  //   return {
+  //     title: item?.name || "Producto",
+  //     text: item?.description
+  //       ? item.description.slice(0, 120) + (item.description.length > 120 ? "..." : "")
+  //       : "Mirá este producto",
+  //     url,
+  //   };
+  // };
+
+  // const handleShare = async () => {
+  //   if (!item) return;
+  //   const shareData = buildShareData();
+
+  //   // 1) Web Share API si está disponible
+  //   if (navigator.share) {
+  //     try {
+  //       await navigator.share(shareData);
+  //       return;
+  //     } catch (err) {
+  //       // Si cancela o falla, continuamos al fallback de clipboard
+  //       console.warn("navigator.share falló o se canceló. Fallback al portapapeles.", err);
+  //     }
+  //   }
+
+  //   // 2) Fallback: copiar al portapapeles
+  //   try {
+  //     await navigator.clipboard.writeText(shareData.url);
+  //     setCopied(true);
+  //     setTimeout(() => setCopied(false), 1600);
+  //   } catch (err) {
+  //     console.error("No se pudo copiar la URL al portapapeles", err);
+  //   }
+  // };
 
   if (!item) {
     return (
@@ -70,16 +136,95 @@ const ProductDetails = () => {
 
         {/* -------- Info -------- */}
         <div className="rounded-xl bg-white ring-1 ring-black/5 shadow-[0_6px_24px_rgba(0,0,0,0.06)] p-6 flex flex-col">
-          {/* Marca + título */}
-          <div className="mb-2">
-            {item.brand ? (
-              <div className="text-xs tracking-wide text-gray-500 uppercase">
-                {item.brand}
-              </div>
-            ) : null}
-            <h1 className="text-[26px] leading-tight font-semibold tracking-tight text-gray-900 mt-1">
-              {item.name}
-            </h1>
+          {/* Marca + título + acciones (favorito + compartir) */}
+          <div className="flex items-start justify-between gap-4 mb-2">
+            <div>
+              {item.brand ? (
+                <div className="text-xs tracking-wide text-gray-500 uppercase">
+                  {item.brand}
+                </div>
+              ) : null}
+              <h1 className="text-[26px] leading-tight font-semibold tracking-tight text-gray-900 mt-1">
+                {item.name}
+              </h1>
+            </div>
+
+            {/* Acciones lado derecho */}
+            <div className="flex items-center gap-2">
+              {/* ❤️ Favorito */}
+              <Tooltip
+                arrow
+                title={
+                  !isLoggedIn
+                    ? "Iniciá sesión para ver tus favoritos"
+                    : isFavorite
+                    ? "Quitar de favoritos"
+                    : "Agregar a favoritos"
+                }
+              >
+                <span>
+                  <button
+                    onClick={() => {
+                      if (!isLoggedIn) return; // Evita acción si no hay sesión
+                      handleToggleFavorite();
+                    }}
+                    disabled={!isLoggedIn}
+                    aria-label={
+                      isLoggedIn
+                        ? isFavorite
+                          ? "Quitar de favoritos"
+                          : "Agregar a favoritos"
+                        : "Iniciá sesión para ver tus favoritos"
+                    }
+                    className={`
+                      w-10 h-10 flex items-center justify-center
+                      rounded-full ring-1 ring-gray-200 bg-white
+                      transition-all shadow-sm
+                      ${
+                        isLoggedIn
+                          ? "hover:bg-gray-100 hover:shadow-md hover:-translate-y-[1px]"
+                          : "opacity-50 cursor-not-allowed"
+                      }
+                    `}
+                  >
+                    {isFavorite ? (
+                      <FavoriteIcon className="text-red-500" />
+                    ) : (
+                      <FavoriteBorderIcon className="text-gray-700" />
+                    )}
+                  </button>
+                </span>
+              </Tooltip>
+
+              {/* 🔗 Compartir */}
+              {/* <Tooltip
+                arrow
+                title={
+                  navigator.share
+                    ? "Compartir"
+                    : copied
+                    ? "¡Enlace copiado!"
+                    : "Copiar enlace"
+                }
+              >
+                <button
+                  // onClick={handleShare}
+                  aria-label="Compartir producto"
+                  className="
+                    w-10 h-10 flex items-center justify-center
+                    rounded-full ring-1 ring-gray-200 bg-white
+                    hover:bg-gray-100 transition-all
+                    shadow-sm hover:shadow-md hover:-translate-y-[1px]
+                  "
+                >
+                  {copied ? (
+                    <CheckIcon className="text-emerald-600" />
+                  ) : (
+                    <ShareIcon className="text-gray-700" />
+                  )}
+                </button>
+              </Tooltip> */}
+            </div>
           </div>
 
           {/* Rating + reviews */}
@@ -244,37 +389,75 @@ const ProductDetails = () => {
               stock={item.stock}
               onChange={(qty) => setQuantity(qty)}
             />
-
-            <Button
-              variant="contained"
-              disabled={!selectedSize || !selectedColor || isOutOfStock}
-              onClick={handleAddToCart}
-              sx={{
-                textTransform: "none",
-                fontWeight: 700,
-                borderRadius: 2,
-                px: 3,
-                py: 1.2,
-                bgcolor:
-                  !selectedSize || !selectedColor || isOutOfStock
-                    ? "grey.300"
-                    : "black",
-                color:
-                  !selectedSize || !selectedColor || isOutOfStock
-                    ? "text.disabled"
-                    : "white",
-                boxShadow:
-                  !selectedSize || !selectedColor || isOutOfStock
-                    ? "none"
-                    : "0 8px 20px rgba(0,0,0,0.25)",
-                "&:hover":
-                  !selectedSize || !selectedColor || isOutOfStock
-                    ? {}
-                    : { bgcolor: "grey.900", transform: "translateY(-1px)" },
-              }}
+            <Tooltip
+              arrow
+              title={
+                !isLoggedIn
+                  ? "Iniciá sesión para agregar productos al carrito"
+                  : isOutOfStock
+                  ? "Sin stock"
+                  : !selectedSize || !selectedColor
+                  ? "Seleccioná talle y color"
+                  : "Agregar al carrito"
+              }
             >
-              Agregar al carrito
-            </Button>
+              <span>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    if (!isLoggedIn) return;
+                    if (isOutOfStock || !selectedSize || !selectedColor) return;
+                    handleAddToCart();
+                  }}
+                  disabled={
+                    !isLoggedIn || !selectedSize || !selectedColor || isOutOfStock
+                  }
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1.2,
+                    bgcolor:
+                      !isLoggedIn ||
+                      !selectedSize ||
+                      !selectedColor ||
+                      isOutOfStock
+                        ? "grey.300"
+                        : "black",
+                    color:
+                      !isLoggedIn ||
+                      !selectedSize ||
+                      !selectedColor ||
+                      isOutOfStock
+                        ? "text.disabled"
+                        : "white",
+                    boxShadow:
+                      !isLoggedIn ||
+                      !selectedSize ||
+                      !selectedColor ||
+                      isOutOfStock
+                        ? "none"
+                        : "0 8px 20px rgba(0,0,0,0.25)",
+                    opacity: !isLoggedIn ? 0.5 : 1,
+                    "&:hover":
+                      !isLoggedIn ||
+                      !selectedSize ||
+                      !selectedColor ||
+                      isOutOfStock
+                        ? {}
+                        : { bgcolor: "grey.900", transform: "translateY(-1px)" },
+                  }}
+                  fullWidth
+                >
+                  {!isLoggedIn
+                    ? "Iniciá sesión"
+                    : isOutOfStock
+                    ? "Sin stock"
+                    : "Agregar al carrito"}
+                </Button>
+              </span>
+            </Tooltip>
           </div>
         </div>
       </div>

@@ -1,11 +1,17 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import ShareIcon from "@mui/icons-material/Share";
 import { Link, useNavigate } from "react-router-dom";
+// Contexto de Wishlist
+import { useWishlist } from "../../context/WishlistContext";
+import { useAuth } from "../../context/AuthContext";
+// Quick View Modal
+import QuickViewModal from "../QuickViewModal";
 
 /* ---------- Helpers ---------- */
 const isNew = (date) => {
@@ -26,8 +32,9 @@ const ProductItem = ({
   item,
   onAddToCart = () => {},
   onQuickView = () => {},
-  onWishlist = () => {},
   onShare = () => {},
+  // Si tenés CartDrawer y querés abrirlo luego de agregar desde QuickView:
+  // onOpenCartDrawer = () => {},
 }) => {
   const navigate = useNavigate();
   const showNew = isNew(item?.createdAt);
@@ -41,6 +48,24 @@ const ProductItem = ({
     (showDiscount && !isNaN(originalPrice)
       ? originalPrice * (1 - Number(item?.discount) / 100)
       : originalPrice);
+
+  // Wishlist
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const isFav = isInWishlist(item?.id);
+
+  // Auth
+  const { isLoggedIn } = useAuth();
+
+  // Estado Quick View
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [quickItem, setQuickItem] = useState(null);
+
+  const handleOpenQuick = (product) => {
+    setQuickItem(product);
+    setQuickOpen(true);
+    // Si querés trackear que vino desde “Agregar al carrito” de la card, podés pasar un flag
+  };
+  const handleCloseQuick = () => setQuickOpen(false);
 
   return (
     <div
@@ -88,7 +113,7 @@ const ProductItem = ({
             "group-hover:translate-y-0 group-hover:opacity-100",
           ].join(" ")}
         >
-          <Tooltip title="Vista rápida" arrow>
+          <Tooltip title="Ver detalles" arrow>
             <Button
               variant="contained"
               size="small"
@@ -118,33 +143,52 @@ const ProductItem = ({
             </Button>
           </Tooltip>
 
-          <Tooltip title="Favorito" arrow>
-            <Button
-              variant="contained"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onWishlist(item);
-              }}
-              className="pointer-events-auto"
-              sx={{
-                minWidth: 42,
-                width: 42,
-                height: 42,
-                p: 0,
-                borderRadius: "9999px",
-                bgcolor: "rgba(255,255,255,0.85)",
-                color: "text.primary",
-                boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
-                backdropFilter: "blur(6px)",
-                "&:hover": {
-                  bgcolor: "rgba(243,244,246,0.95)",
-                  transform: "translateY(-1px)",
-                },
-              }}
-            >
-              <FavoriteBorderIcon fontSize="small" />
-            </Button>
+          {/* Favorito con estado */}
+          <Tooltip
+            title={
+              !isLoggedIn
+                ? "Iniciá sesión para ver tus favoritos"
+                : isFav
+                ? "Quitar de Favoritos"
+                : "Agregar a Favoritos"
+            }
+            arrow
+          >
+            <span>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!isLoggedIn) return; // evita toggle si no hay sesión
+                  toggleWishlist(item);
+                }}
+                disabled={!isLoggedIn}
+                className="pointer-events-auto"
+                sx={{
+                  minWidth: 42,
+                  width: 42,
+                  height: 42,
+                  p: 0,
+                  borderRadius: "9999px",
+                  bgcolor: "rgba(255,255,255,0.85)",
+                  color: isFav ? "error.main" : "text.primary",
+                  boxShadow: "0 6px 18px rgba(0,0,0,0.12)",
+                  backdropFilter: "blur(6px)",
+                  "&:hover": {
+                    bgcolor: "rgba(243,244,246,0.95)",
+                    transform: "translateY(-1px)",
+                  },
+                  opacity: !isLoggedIn ? 0.5 : 1,
+                }}
+              >
+                {isFav ? (
+                  <FavoriteIcon fontSize="small" />
+                ) : (
+                  <FavoriteBorderIcon fontSize="small" />
+                )}
+              </Button>
+            </span>
           </Tooltip>
 
           <Tooltip title="Compartir" arrow>
@@ -199,12 +243,7 @@ const ProductItem = ({
 
         {/* Rating (slot fijo) */}
         <div className="flex items-center gap-2 min-h-[24px]">
-          <Rating
-            name="read-only"
-            value={Number(item?.rating) || 0}
-            readOnly
-            size="small"
-          />
+          <Rating name="read-only" value={Number(item?.rating) || 0} readOnly size="small" />
           {item?.ratingCount ? (
             <span className="text-xs text-gray-500">({item.ratingCount})</span>
           ) : (
@@ -223,7 +262,6 @@ const ProductItem = ({
               Sin stock
             </div>
           ) : (
-            // placeholder invisible para conservar altura
             <div className="text-[11px] opacity-0 select-none">.</div>
           )}
         </div>
@@ -236,7 +274,6 @@ const ProductItem = ({
                 {currencyAR(originalPrice)}
               </span>
             ) : (
-              // Mantener línea de precio original aunque no exista descuento
               <span className="text-xs text-transparent select-none leading-4">.</span>
             )}
 
@@ -245,42 +282,82 @@ const ProductItem = ({
                 {currencyAR(offerPrice)}
               </span>
             ) : (
-              // Si no hay precio, mantener espacio
-              <span className="text-xl font-bold text-transparent select-none">
-                .
-              </span>
+              <span className="text-xl font-bold text-transparent select-none">.</span>
             )}
           </div>
 
-          {/* espacio complementario para mantener layout simétrico */}
+          {/* espacio simétrico */}
           <div className="w-8 h-4" />
         </div>
 
-        {/* Botón minimalista debajo del precio (slot fijo por padding inferior) */}
+        {/* CTA debajo del precio → abre Quick View */}
         <div className="mt-2">
-          <Button
-            variant="outlined"
-            fullWidth
-            onClick={() => onAddToCart(item)}
-            disabled={isOutOfStock}
-            sx={{
-              textTransform: "none",
-              fontWeight: 600,
-              borderRadius: 2,
-              height: 40,
-              borderColor: "grey.300",
-              color: isOutOfStock ? "text.disabled" : "text.primary",
-              bgcolor: "transparent",
-              boxShadow: "none",
-              "&:hover": isOutOfStock
-                ? {}
-                : { borderColor: "grey.400", bgcolor: "rgba(0,0,0,0.02)" },
-            }}
+          <Tooltip
+            arrow
+            title={
+              !isLoggedIn
+                ? "Iniciá sesión para agregar productos al carrito"
+                : isOutOfStock
+                ? "Sin stock"
+                : "Seleccioná variantes y cantidad"
+            }
           >
-            {isOutOfStock ? "Sin stock" : "Agregar al carrito"}
-          </Button>
+            <span>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => {
+                  if (!isLoggedIn) return; // mantiene tu regla de login
+                  if (isOutOfStock) return;
+                  // 👉 Abrimos Quick View para elegir talle/color/cantidad
+                  handleOpenQuick(item);
+                }}
+                disabled={!isLoggedIn || isOutOfStock}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  height: 40,
+                  borderColor: "grey.300",
+                  color:
+                    !isLoggedIn || isOutOfStock ? "text.disabled" : "text.primary",
+                  bgcolor: "transparent",
+                  boxShadow: "none",
+                  opacity: !isLoggedIn ? 0.5 : 1,
+                  "&:hover":
+                    !isLoggedIn || isOutOfStock
+                      ? {}
+                      : { borderColor: "grey.400", bgcolor: "rgba(0,0,0,0.02)" },
+                }}
+              >
+                {!isLoggedIn
+                  ? "Iniciá sesión"
+                  : isOutOfStock
+                  ? "Sin stock"
+                  : "Agregar al carrito"}
+              </Button>
+            </span>
+          </Tooltip>
         </div>
       </div>
+
+      {/* ===== Quick View Modal ===== */}
+      <QuickViewModal
+        open={quickOpen}
+        onClose={handleCloseQuick}
+        item={quickItem}
+        onAdded={(cartItem) => {
+          // Si querés integrarlo ya:
+          // addToCart(cartItem);
+          // onOpenCartDrawer?.();
+          console.log("Agregado desde QuickView:", cartItem);
+          onAddToCart?.(cartItem); // mantiene compatibilidad con prop externa
+        }}
+        onGoToDetails={(prod) => {
+          handleCloseQuick();
+          navigate(`/productdetails/${prod?.id}`, { state: prod });
+        }}
+      />
     </div>
   );
 };

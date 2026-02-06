@@ -6,7 +6,6 @@ import Footer from './components/Footer'
 import ProductListing from './pages/ProductListing'
 import ProductDetails from './pages/ProductDetails'
 import ScrollToTop from './components/ScrollToTop'
-import { createContext } from 'react'
 import Login from './pages/Login'
 import Register from './pages/Registro'
 import TermsAndConditions from './pages/TerminosCondiciones'
@@ -14,12 +13,15 @@ import PoliticaDePrivacidad from './pages/Privacidad'
 import Cart from './pages/Cart'
 import Wishlist from './pages/Wishlist'
 
-const AppContext = createContext();
+import { WishlistProvider } from './context/WishlistContext'
+import { AuthProvider } from './context/AuthContext'
+
 function App() {
 
   return (
     <>
-    <AppContext.Provider>
+    <AuthProvider>
+    <WishlistProvider>
     <BrowserRouter>
       <ScrollToTop />
       <Header />
@@ -36,7 +38,8 @@ function App() {
       </Routes>
       <Footer />
     </BrowserRouter>
-    </AppContext.Provider>
+    </WishlistProvider>
+    </AuthProvider>
     </>
   )
 }

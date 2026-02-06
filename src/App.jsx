@@ -12,14 +12,16 @@ import TermsAndConditions from './pages/TerminosCondiciones'
 import PoliticaDePrivacidad from './pages/Privacidad'
 import Cart from './pages/Cart'
 import Wishlist from './pages/Wishlist'
-
+// Contextos
 import { WishlistProvider } from './context/WishlistContext'
 import { AuthProvider } from './context/AuthContext'
+import { CartProvider } from './context/CartContext'
 
 function App() {
 
   return (
     <>
+    <CartProvider>
     <AuthProvider>
     <WishlistProvider>
     <BrowserRouter>
@@ -40,6 +42,7 @@ function App() {
     </BrowserRouter>
     </WishlistProvider>
     </AuthProvider>
+    </CartProvider>
     </>
   )
 }

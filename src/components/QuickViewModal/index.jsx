@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 // Contextos
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { useCart } from "../../context/CartContext";
 
 // Tu selector de cantidad existente
 import QuantitySelector from "../QuantitySelector";
@@ -116,6 +117,9 @@ const QuickViewModal = ({ open, onClose, item, onAdded, onGoToDetails }) => {
     else addToWishlist(item);
   };
 
+  // Add Cart
+  const { addToCart } = useCart();
+
   const handleAddToCart = () => {
     if (!canAdd || !item) return;
     const cartItem = {
@@ -129,7 +133,7 @@ const QuickViewModal = ({ open, onClose, item, onAdded, onGoToDetails }) => {
     };
     // TODO: integrar con CartContext → addToCart(cartItem)
     console.log("AGREGADO AL CARRITO (QuickView):", cartItem);
-    onAdded?.(cartItem);
+    addToCart(cartItem);
     onClose?.();
   };
 
@@ -141,6 +145,8 @@ const QuickViewModal = ({ open, onClose, item, onAdded, onGoToDetails }) => {
   };
 
   if (!item) return null;
+
+
 
   return (
     <Dialog

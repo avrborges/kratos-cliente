@@ -18,6 +18,7 @@ import logo from "../../assets/DRAKOS.png";
 // Context
 import { useWishlist } from "../../context/WishlistContext";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const Header = () => {
 
@@ -25,6 +26,7 @@ const Header = () => {
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const { wishlist } = useWishlist();
   const { isLoggedIn } = useAuth();
+  const { cart } = useCart();
 
   return (
     <header className="w-full bg-white shadow-sm ring-1 ring-black/5">
@@ -149,7 +151,7 @@ const Header = () => {
                       },
                     }}
                   >
-                    <Badge badgeContent={isLoggedIn ? 0 : 0} color="primary">
+                    <Badge badgeContent={isLoggedIn ? cart.length : 0} color="primary">
                       <ShoppingCartIcon className="text-gray-700" />
                     </Badge>
                   </IconButton>

@@ -1,5 +1,5 @@
 // src/components/CartDrawer.jsx
-import { useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,67 +17,62 @@ import { useNavigate } from "react-router-dom";
 // Context
 import { useCart } from "../../context/CartContext";
 
-const CartDrawer = ({ open, onClose }) => {
+export default function CartDrawer({ open, onClose }) {
   const navigate = useNavigate();
-  const {
-    cart,
-    removeFromCart,
-    incrementItem,
-    decrementItem,
-    clearCart,
-  } = useCart();
-
+  const { cart, removeFromCart, incrementItem, decrementItem, clearCart } = useCart();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  // Subtotal: price (final) * quantity
-  const subtotal = cart.reduce((acc, item) => {
-    const price = Number(item.price || 0);
-    const qty = Number(item.quantity || 1);
-    return acc + price * qty;
-  }, 0);
+  // ✅ Evitar recrear objetos grandes de estilos en cada render
+  const paperProps = useMemo(
+    () => ({
+      sx: {
+        width: 380,
+        maxWidth: "90vw",
+        bgcolor: "white",
+        borderLeft: "1px solid #e5e7eb",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
+        display: "flex",
+      },
+    }),
+    []
+  );
 
-  // Envío (gratis si supera 100k)
-  const shippingCost = subtotal > 100000 ? 0 : 3500;
+  // ✅ Memoizar cálculos para estabilidad y micro-optimizaciones
+  const { subtotal, shippingCost, total } = useMemo(() => {
+    const sub = cart.reduce((acc, item) => {
+      const price = Number(item.price || 0);
+      const qty = Number(item.quantity || 1);
+      return acc + price * qty;
+    }, 0);
+    const ship = sub > 100000 ? 0 : 3500;
+    return { subtotal: sub, shippingCost: ship, total: sub + ship };
+  }, [cart]);
 
-  // Total final
-  const total = subtotal + shippingCost;
+  const money = useCallback(
+    (n) => n.toLocaleString("es-AR"),
+    []
+  );
 
-  const handleCheckout = () => {
+  // ✅ Handlers estables, dependen solo de navigate/onClose
+  const handleCheckout = useCallback(() => {
     onClose?.();
     navigate("/checkout");
-  };
+  }, [navigate, onClose]);
 
-  const handleGoToCartPage = () => {
+  const handleGoToCartPage = useCallback(() => {
     onClose?.();
     navigate("/cart");
-  };
+  }, [navigate, onClose]);
 
-  const handleConfirmVaciar = () => {
-    setConfirmOpen(true);
-  };
-
-  const handleVaciar = () => {
+  const handleConfirmVaciar = useCallback(() => setConfirmOpen(true), []);
+  const handleVaciar = useCallback(() => {
     clearCart();
     setConfirmOpen(false);
-  };
+  }, [clearCart]);
 
   return (
     <>
-      <Drawer
-        anchor="right"
-        open={open}
-        onClose={onClose}
-        PaperProps={{
-          sx: {
-            width: 380,
-            maxWidth: "90vw",
-            bgcolor: "white",
-            borderLeft: "1px solid #e5e7eb",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
-            display: "flex",
-          },
-        }}
-      >
+      <Drawer anchor="right" open={open} onClose={onClose} PaperProps={paperProps}>
         {/* HEADER */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
@@ -126,6 +121,7 @@ const CartDrawer = ({ open, onClose }) => {
                     src={item.image || item.images?.[0]}
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded-md"
+                    loading="lazy"
                   />
 
                   {/* Info */}
@@ -187,7 +183,7 @@ const CartDrawer = ({ open, onClose }) => {
                     {/* Precio por línea y quitar */}
                     <div className="mt-1 flex items-center justify-between">
                       <p className="text-gray-800 font-semibold">
-                        ${lineTotal.toLocaleString("es-AR")}
+                        ${money(lineTotal)}
                       </p>
 
                       {typeof removeFromCart === "function" && (
@@ -202,10 +198,7 @@ const CartDrawer = ({ open, onClose }) => {
                             "&:hover": { bgcolor: "grey.100" },
                           }}
                         >
-                          <DeleteOutlineIcon
-                            fontSize="small"
-                            className="text-gray-700"
-                          />
+                          <DeleteOutlineIcon fontSize="small" className="text-gray-700" />
                         </IconButton>
                       )}
                     </div>
@@ -222,7 +215,7 @@ const CartDrawer = ({ open, onClose }) => {
           <div className="flex justify-between text-gray-700 text-[15px] font-medium">
             <span>Subtotal:</span>
             <span className="font-semibold text-gray-900">
-              ${subtotal.toLocaleString("es-AR")}
+              ${money(subtotal)}
             </span>
           </div>
 
@@ -234,9 +227,7 @@ const CartDrawer = ({ open, onClose }) => {
                 shippingCost === 0 ? "text-emerald-600" : "text-gray-900"
               }`}
             >
-              {shippingCost === 0
-                ? "Gratis"
-                : `$${shippingCost.toLocaleString("es-AR")}`}
+              {shippingCost === 0 ? "Gratis" : `$${money(shippingCost)}`}
             </span>
           </div>
 
@@ -244,7 +235,7 @@ const CartDrawer = ({ open, onClose }) => {
           <div className="flex justify-between text-gray-700 text-[16px] font-semibold border-t pt-2">
             <span>Total:</span>
             <span className="text-gray-900">
-              ${total.toLocaleString("es-AR")}
+              ${money(total)}
             </span>
           </div>
 
@@ -304,17 +295,11 @@ const CartDrawer = ({ open, onClose }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)}>Cancelar</Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleVaciar}
-          >
+          <Button variant="contained" color="error" onClick={handleVaciar}>
             Vaciar
           </Button>
         </DialogActions>
       </Dialog>
     </>
   );
-};
-
-export default CartDrawer;
+}

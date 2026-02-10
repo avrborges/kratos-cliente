@@ -1,17 +1,17 @@
 import React from "react";
 import { useWishlist } from "../../context/WishlistContext";
 import { useNavigate } from "react-router-dom";
+
+// Icons
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
-const currency = (v) =>
-  typeof v === "number"
-    ? new Intl.NumberFormat("es-AR", {
-        style: "currency",
-        currency: "ARS",
-        maximumFractionDigits: 0,
-      }).format(v)
-    : "";
+// Helpers externos
+import {
+  formatCurrency,
+  getThumbnail,
+  getPriceInfo,
+} from "./wishlist.helpers";
 
 const Wishlist = () => {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -53,10 +53,8 @@ const Wishlist = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {wishlist.map((item) => {
-              const thumb =
-                Array.isArray(item.images) && item.images.length > 0
-                  ? item.images[0]
-                  : null;
+              const thumb = getThumbnail(item); // { src, alt } | null
+              const { price, offer } = getPriceInfo(item);
 
               return (
                 <div
@@ -67,24 +65,24 @@ const Wishlist = () => {
                     p-4 flex flex-col
                   "
                 >
-                  {/* IMAGEN */}
-                  <div
-                    onClick={() => handleGoToDetails(item)}
-                    className="cursor-pointer"
-                  >
-                    {thumb ? (
-                      <img
-                        src={thumb}
-                        alt={item.name}
-                        className="w-full h-56 object-cover rounded-lg ring-1 ring-gray-200"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-56 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-                        sin imagen
-                      </div>
-                    )}
-                  </div>
+                {/* IMAGEN */}
+                <div
+                  onClick={() => handleGoToDetails(item)}
+                  className="cursor-pointer"
+                >
+                  {thumb ? (
+                    <img
+                      src={thumb.src}
+                      alt={thumb.alt}
+                      className="w-full h-56 object-cover rounded-lg ring-1 ring-gray-200"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-56 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
+                      sin imagen
+                    </div>
+                  )}
+                </div>
 
                   {/* INFO */}
                   <div className="mt-4 flex-1">
@@ -100,18 +98,18 @@ const Wishlist = () => {
                     </p>
 
                     <div className="mt-2 flex items-center gap-2">
-                      {item.offerprice ? (
+                      {offer ? (
                         <>
                           <span className="text-xl font-bold text-gray-900">
-                            {currency(item.offerprice)}
+                            {formatCurrency(offer)}
                           </span>
                           <span className="text-sm line-through text-gray-400">
-                            {currency(item.price)}
+                            {formatCurrency(price)}
                           </span>
                         </>
                       ) : (
                         <span className="text-xl font-bold text-gray-900">
-                          {currency(item.price)}
+                          {formatCurrency(price)}
                         </span>
                       )}
                     </div>

@@ -13,25 +13,36 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 // Librerías
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 
-// Mock data
+// Mock data (debe ser puro: solo arrays/objetos)
 import { MockBlogPosts } from "../../mocks";
 
-dayjs.locale("es");
+export default function BlogSlider() {
+  // ✅ Evitar side-effect a nivel de módulo
+  useEffect(() => {
+    dayjs.locale("es");
+  }, []);
 
-const BlogSlider = () => {
+  // ✅ Mantener referencia estable para evitar reconfiguración de Swiper
+  const swiperModules = useMemo(
+    () => [Navigation, Pagination, Scrollbar, A11y],
+    []
+  );
+
   return (
     <div className="blogSlider py-10">
       <Swiper
-        modules={[Navigation, Pagination, Scrollbar, A11y]}
+        modules={swiperModules}
         spaceBetween={24}
         slidesPerView={3}
         navigation
         pagination={{
           clickable: true,
           bulletClass: "swiper-pagination-bullet custom-bullet",
-          bulletActiveClass: "swiper-pagination-bullet-active custom-bullet-active",
+          bulletActiveClass:
+            "swiper-pagination-bullet-active custom-bullet-active",
         }}
         scrollbar={{ draggable: true }}
         className="pb-10"
@@ -43,7 +54,7 @@ const BlogSlider = () => {
                 "group rounded-xl overflow-hidden bg-white h-[420px]",
                 "shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5",
                 "transition-all duration-300 hover:shadow-[0_14px_40px_rgba(0,0,0,0.10)]",
-                "flex flex-col"
+                "flex flex-col",
               ].join(" ")}
             >
               {/* Imagen */}
@@ -52,6 +63,7 @@ const BlogSlider = () => {
                   src={post.image}
                   alt={post.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
                 />
               </div>
 
@@ -61,7 +73,9 @@ const BlogSlider = () => {
                 <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
                   <AccessTimeIcon fontSize="small" className="text-gray-500" />
                   <span>
-                    {dayjs(post.createAt).format("DD [de] MMMM [de] YYYY")}
+                    {dayjs(post.createdAt ?? post.createAt).format(
+                      "DD [de] MMMM [de] YYYY"
+                    )}
                   </span>
                 </div>
 
@@ -82,11 +96,10 @@ const BlogSlider = () => {
                 <Link
                   to={`/blog/${post.id}`}
                   className="mt-auto text-sm font-medium flex items-center gap-1 text-gray-800 hover:text-gray-500 transition-colors"
+                  aria-label={`Leer más sobre ${post.title}`}
                 >
                   Leer más
-                  <KeyboardArrowRightIcon
-                    className="transition-transform group-hover:translate-x-1"
-                  />
+                  <KeyboardArrowRightIcon className="transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
             </div>
@@ -94,7 +107,7 @@ const BlogSlider = () => {
         ))}
       </Swiper>
 
-      {/* Estilos Swiper personalizados */}
+      {/* ⚠️ Recomendación: mover este bloque a un archivo CSS/global para mayor estabilidad en HMR */}
       <style>
         {`
           .custom-bullet {
@@ -115,6 +128,4 @@ const BlogSlider = () => {
       </style>
     </div>
   );
-};
-
-export default BlogSlider;
+}

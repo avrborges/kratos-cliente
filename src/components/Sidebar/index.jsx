@@ -1,39 +1,41 @@
 import React from "react";
-import { MockCategories } from "../../mocks";
-import { MockFiltros } from "../../mocks";
+import { MockCategories, MockFiltros } from "../../mocks";
 
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Box, Tooltip } from "@mui/material";
+import { Box } from "@mui/material";
 
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-
 import { Collapse } from "react-collapse";
 import Button from "@mui/material/Button";
 import Rating from "@mui/material/Rating";
 import RangeSlider from "react-range-slider-input";
 import "react-range-slider-input/dist/style.css";
 
-/* ---------------- Color Dot Component ---------------- */
-const ColorDot = ({ color }) => (
+
+/* -----------------------------------------------------
+   COMPONENTES ESTÁTICOS (DEBEN ESTAR FUERA DEL SIDEBAR)
+----------------------------------------------------- */
+
+// ● Color simples
+export const ColorDot = ({ color }) => (
   <Box
     component="span"
-    sx={(theme) => ({
+    sx={{
       width: 18,
       height: 18,
       borderRadius: "50%",
       bgcolor: color,
-      border: "1px solid",
-      borderColor:
-        theme.palette.mode === "dark" ? "grey.700" : "grey.300",
+      border: "1px solid #ccc",
       display: "inline-block",
-    })}
+    }}
   />
 );
 
-const CheckedDot = ({ color }) => (
+// ● Color con borde seleccionado
+export const CheckedDot = ({ color }) => (
   <Box sx={{ position: "relative", lineHeight: 0 }}>
     <ColorDot color={color} />
     <Box
@@ -41,15 +43,43 @@ const CheckedDot = ({ color }) => (
         position: "absolute",
         inset: -2,
         borderRadius: "50%",
-        border: "2px solid",
-        borderColor: "primary.main",
+        border: "2px solid black",
         pointerEvents: "none",
       }}
     />
   </Box>
 );
 
-/* ---------------- Sidebar Component ---------------- */
+// ● Título de cada sección (ya no está dentro del render)
+export const SectionTitle = ({ title, isOpen, toggle }) => (
+  <h3 className="mb-2 text-[16px] font-semibold flex items-center justify-between pr-3 text-gray-900">
+    {title}
+
+    <Button
+      onClick={toggle}
+      className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full"
+      sx={{
+        borderRadius: "50%",
+        minWidth: 30,
+        width: 30,
+        height: 30,
+        padding: 0,
+        color: "#111",
+        "&:hover": {
+          backgroundColor: "rgba(0,0,0,0.08)",
+        },
+      }}
+    >
+      {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+    </Button>
+  </h3>
+);
+
+
+/* -----------------------------------------------------
+   COMPONENTE PRINCIPAL: SIDEBAR (YA LIMPIO)
+----------------------------------------------------- */
+
 const Sidebar = () => {
   const [isOpenCategories, setIsOpenCategories] = React.useState(true);
   const [isOpenStock, setIsOpenStock] = React.useState(true);
@@ -58,35 +88,11 @@ const Sidebar = () => {
   const [isOpenPrecio, setIsOpenPrecio] = React.useState(true);
   const [isOpenRating, setIsOpenRating] = React.useState(true);
 
-  /* ---------------- Header Title Component ---------------- */
-  const SectionTitle = ({ title, isOpen, toggle }) => (
-    <h3 className="mb-2 text-[16px] font-semibold flex items-center justify-between pr-3 text-gray-900">
-      {title}
-      <Button
-        onClick={toggle}
-        className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full"
-        sx={{
-          borderRadius: "50%",
-          minWidth: 30,
-          width: 30,
-          height: 30,
-          padding: 0,
-          color: "#111",
-          "&:hover": {
-            backgroundColor: "rgba(0,0,0,0.08)",
-          },
-        }}
-      >
-        {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-      </Button>
-    </h3>
-  );
-
   return (
     <aside className="sidebar space-y-5">
 
       {/* ✦ Categorías */}
-      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+      <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Categorías"
           isOpen={isOpenCategories}
@@ -96,9 +102,9 @@ const Sidebar = () => {
         <Collapse isOpened={isOpenCategories}>
           <div className="max-h-[240px] overflow-y-auto pr-1">
             <FormGroup>
-              {MockCategories.map((category, i) => (
+              {MockCategories.map((category) => (
                 <FormControlLabel
-                  key={i}
+                  key={category.id}
                   label={category.name}
                   sx={{
                     "& .MuiFormControlLabel-label": {
@@ -106,9 +112,7 @@ const Sidebar = () => {
                       color: "gray.800",
                     },
                   }}
-                  control={
-                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
-                  }
+                  control={<Checkbox size="small" />}
                 />
               ))}
             </FormGroup>
@@ -117,7 +121,7 @@ const Sidebar = () => {
       </div>
 
       {/* ✦ Stock */}
-      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+      <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="En stock"
           isOpen={isOpenStock}
@@ -131,15 +135,7 @@ const Sidebar = () => {
                 <FormControlLabel
                   key={stock.id}
                   label={stock.label}
-                  sx={{
-                    "& .MuiFormControlLabel-label": {
-                      fontSize: 14,
-                      color: "gray.800",
-                    },
-                  }}
-                  control={
-                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
-                  }
+                  control={<Checkbox size="small" />}
                 />
               ))}
             </FormGroup>
@@ -148,7 +144,7 @@ const Sidebar = () => {
       </div>
 
       {/* ✦ Talles */}
-      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+      <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Talles"
           isOpen={isOpenTalle}
@@ -156,33 +152,26 @@ const Sidebar = () => {
         />
 
         <Collapse isOpened={isOpenTalle}>
-          <div className="max-h-[240px] overflow-y-auto pr-1">
-            <FormGroup
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                gap: 1,
-              }}
-            >
-              {MockFiltros.sizes.map((size) => (
-                <FormControlLabel
-                  key={size.id}
-                  label={size.label}
-                  sx={{
-                    "& .MuiFormControlLabel-label": { fontSize: 14, color: "gray.800" },
-                  }}
-                  control={
-                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
-                  }
-                />
-              ))}
-            </FormGroup>
-          </div>
+          <FormGroup
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: 1,
+            }}
+          >
+            {MockFiltros.sizes.map((size) => (
+              <FormControlLabel
+                key={size.id}
+                label={size.label}
+                control={<Checkbox size="small" />}
+              />
+            ))}
+          </FormGroup>
         </Collapse>
       </div>
 
       {/* ✦ Colores */}
-      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+      <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Colores"
           isOpen={isOpenColor}
@@ -190,7 +179,7 @@ const Sidebar = () => {
         />
 
         <Collapse isOpened={isOpenColor}>
-          <div className="flex flex-wrap gap-3 mt-2 pr-1">
+          <div className="flex flex-wrap gap-3 mt-2">
             {MockFiltros.colors.map((color) => (
               <FormControlLabel
                 key={color.id}
@@ -208,8 +197,8 @@ const Sidebar = () => {
         </Collapse>
       </div>
 
-      {/* ✦ Precios */}
-      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+      {/* ✦ Precio */}
+      <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Precio"
           isOpen={isOpenPrecio}
@@ -217,9 +206,9 @@ const Sidebar = () => {
         />
 
         <Collapse isOpened={isOpenPrecio}>
-          <div className="w-full mt-3">
+          <div className="mt-3">
             <RangeSlider min={100} max={50000} />
-            <div className="flex justify-between text-[13px] mt-4 text-gray-700">
+            <div className="flex justify-between text-xs mt-3 text-gray-700">
               <span>Desde: <strong>$100</strong></span>
               <span>Hasta: <strong>$50.000</strong></span>
             </div>
@@ -228,7 +217,7 @@ const Sidebar = () => {
       </div>
 
       {/* ✦ Rating */}
-      <div className="bg-gray-50 rounded-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] ring-1 ring-black/5 p-4">
+      <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Rating"
           isOpen={isOpenRating}
@@ -242,18 +231,14 @@ const Sidebar = () => {
                 <FormControlLabel
                   key={rate.id}
                   label={<Rating value={rate.value} readOnly size="small" />}
-                  sx={{
-                    "& .MuiFormControlLabel-label": { fontSize: 14, color: "gray.800" },
-                  }}
-                  control={
-                    <Checkbox size="small" sx={{ "& .MuiSvgIcon-root": { fontSize: 18 } }} />
-                  }
+                  control={<Checkbox size="small" />}
                 />
               ))}
             </FormGroup>
           </div>
         </Collapse>
       </div>
+
     </aside>
   );
 };

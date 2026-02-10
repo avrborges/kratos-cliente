@@ -153,7 +153,7 @@ export default function ProductListing() {
             </h1>
 
             {/* Toolbar */}
-            <div className="mt-4 flex items-center justify-between rounded-lg px-2 py-1">
+            <div className="mt-4 flex items-center justify-between rounded-lg px-2 py-">
               
               {/* View Mode */}
               <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ export default function ProductListing() {
               color="primary"
               siblingCount={1}
               boundaryCount={1}
-              showfirstButton
+              showFirstButton
               showLastButton
             />
           </div>

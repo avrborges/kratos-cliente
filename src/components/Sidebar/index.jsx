@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { MockCategories, MockFiltros } from "../../mocks";
 
 import FormGroup from "@mui/material/FormGroup";
@@ -15,12 +15,10 @@ import RangeSlider from "react-range-slider-input";
 import "react-range-slider-input/dist/style.css";
 
 
-/* -----------------------------------------------------
-   COMPONENTES ESTÁTICOS (DEBEN ESTAR FUERA DEL SIDEBAR)
------------------------------------------------------ */
-
-// ● Color simples
-export const ColorDot = ({ color }) => (
+/* ======================================================
+   SUBCOMPONENTES OPTIMIZADOS (NO SE RECREAN)
+====================================================== */
+export const ColorDot = React.memo(({ color }) => (
   <Box
     component="span"
     sx={{
@@ -32,10 +30,9 @@ export const ColorDot = ({ color }) => (
       display: "inline-block",
     }}
   />
-);
+));
 
-// ● Color con borde seleccionado
-export const CheckedDot = ({ color }) => (
+export const CheckedDot = React.memo(({ color }) => (
   <Box sx={{ position: "relative", lineHeight: 0 }}>
     <ColorDot color={color} />
     <Box
@@ -48,10 +45,9 @@ export const CheckedDot = ({ color }) => (
       }}
     />
   </Box>
-);
+));
 
-// ● Título de cada sección (ya no está dentro del render)
-export const SectionTitle = ({ title, isOpen, toggle }) => (
+export const SectionTitle = React.memo(({ title, isOpen, toggle }) => (
   <h3 className="mb-2 text-[16px] font-semibold flex items-center justify-between pr-3 text-gray-900">
     {title}
 
@@ -73,45 +69,49 @@ export const SectionTitle = ({ title, isOpen, toggle }) => (
       {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
     </Button>
   </h3>
-);
+));
 
 
-/* -----------------------------------------------------
-   COMPONENTE PRINCIPAL: SIDEBAR (YA LIMPIO)
------------------------------------------------------ */
-
+/* ======================================================
+   SIDEBAR PRINCIPAL OPTIMIZADO
+====================================================== */
 const Sidebar = () => {
-  const [isOpenCategories, setIsOpenCategories] = React.useState(true);
-  const [isOpenStock, setIsOpenStock] = React.useState(true);
-  const [isOpenTalle, setIsOpenTalle] = React.useState(true);
-  const [isOpenColor, setIsOpenColor] = React.useState(true);
-  const [isOpenPrecio, setIsOpenPrecio] = React.useState(true);
-  const [isOpenRating, setIsOpenRating] = React.useState(true);
+  // Estado ÚNICO para todos los toggles
+  const [open, setOpen] = useState({
+    categories: true,
+    stock: true,
+    talle: true,
+    color: true,
+    precio: true,
+    rating: true,
+  });
+
+  // toggle optimizado
+  const toggle = useCallback(
+    (key) => {
+      setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+    },
+    []
+  );
 
   return (
     <aside className="sidebar space-y-5">
 
-      {/* ✦ Categorías */}
+      {/* Categorías */}
       <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Categorías"
-          isOpen={isOpenCategories}
-          toggle={() => setIsOpenCategories(!isOpenCategories)}
+          isOpen={open.categories}
+          toggle={() => toggle("categories")}
         />
 
-        <Collapse isOpened={isOpenCategories}>
+        <Collapse isOpened={open.categories}>
           <div className="max-h-[240px] overflow-y-auto pr-1">
             <FormGroup>
               {MockCategories.map((category) => (
                 <FormControlLabel
                   key={category.id}
                   label={category.name}
-                  sx={{
-                    "& .MuiFormControlLabel-label": {
-                      fontSize: 14,
-                      color: "gray.800",
-                    },
-                  }}
                   control={<Checkbox size="small" />}
                 />
               ))}
@@ -120,38 +120,34 @@ const Sidebar = () => {
         </Collapse>
       </div>
 
-      {/* ✦ Stock */}
+      {/* Stock */}
       <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="En stock"
-          isOpen={isOpenStock}
-          toggle={() => setIsOpenStock(!isOpenStock)}
+          isOpen={open.stock}
+          toggle={() => toggle("stock")}
         />
 
-        <Collapse isOpened={isOpenStock}>
+        <Collapse isOpened={open.stock}>
           <div className="max-h-[240px] overflow-y-auto pr-1">
             <FormGroup>
-              {MockFiltros.stocks.map((stock) => (
-                <FormControlLabel
-                  key={stock.id}
-                  label={stock.label}
-                  control={<Checkbox size="small" />}
-                />
+              {MockFiltros.stocks.map((s) => (
+                <FormControlLabel key={s.id} label={s.label} control={<Checkbox size="small" />} />
               ))}
             </FormGroup>
           </div>
         </Collapse>
       </div>
 
-      {/* ✦ Talles */}
+      {/* Talles */}
       <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Talles"
-          isOpen={isOpenTalle}
-          toggle={() => setIsOpenTalle(!isOpenTalle)}
+          isOpen={open.talle}
+          toggle={() => toggle("talle")}
         />
 
-        <Collapse isOpened={isOpenTalle}>
+        <Collapse isOpened={open.talle}>
           <FormGroup
             sx={{
               display: "grid",
@@ -159,10 +155,10 @@ const Sidebar = () => {
               gap: 1,
             }}
           >
-            {MockFiltros.sizes.map((size) => (
+            {MockFiltros.sizes.map((sz) => (
               <FormControlLabel
-                key={size.id}
-                label={size.label}
+                key={sz.id}
+                label={sz.label}
                 control={<Checkbox size="small" />}
               />
             ))}
@@ -170,24 +166,24 @@ const Sidebar = () => {
         </Collapse>
       </div>
 
-      {/* ✦ Colores */}
+      {/* Colores */}
       <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Colores"
-          isOpen={isOpenColor}
-          toggle={() => setIsOpenColor(!isOpenColor)}
+          isOpen={open.color}
+          toggle={() => toggle("color")}
         />
 
-        <Collapse isOpened={isOpenColor}>
-          <div className="flex flex-wrap gap-3 mt-2">
-            {MockFiltros.colors.map((color) => (
+        <Collapse isOpened={open.color}>
+          <div className="flex flex-wrap gap-3">
+            {MockFiltros.colors.map((c) => (
               <FormControlLabel
-                key={color.id}
+                key={c.id}
                 label=""
                 control={
                   <Checkbox
-                    icon={<ColorDot color={color.hex} />}
-                    checkedIcon={<CheckedDot color={color.hex} />}
+                    icon={<ColorDot color={c.hex} />}
+             checkedIcon={<CheckedDot color={c.hex} />}
                     sx={{ p: 0.4 }}
                   />
                 }
@@ -197,34 +193,32 @@ const Sidebar = () => {
         </Collapse>
       </div>
 
-      {/* ✦ Precio */}
+      {/* Precio */}
       <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Precio"
-          isOpen={isOpenPrecio}
-          toggle={() => setIsOpenPrecio(!isOpenPrecio)}
+          isOpen={open.precio}
+          toggle={() => toggle("precio")}
         />
 
-        <Collapse isOpened={isOpenPrecio}>
-          <div className="mt-3">
-            <RangeSlider min={100} max={50000} />
-            <div className="flex justify-between text-xs mt-3 text-gray-700">
-              <span>Desde: <strong>$100</strong></span>
-              <span>Hasta: <strong>$50.000</strong></span>
-            </div>
+        <Collapse isOpened={open.precio}>
+          <RangeSlider min={100} max={50000} />
+          <div className="text-xs mt-3 flex justify-between text-gray-700">
+            <span>Desde: <strong>$100</strong></span>
+            <span>Hasta: <strong>$50.000</strong></span>
           </div>
         </Collapse>
       </div>
 
-      {/* ✦ Rating */}
+      {/* Rating */}
       <div className="bg-gray-50 rounded-xl ring-1 ring-black/5 shadow p-4">
         <SectionTitle
           title="Rating"
-          isOpen={isOpenRating}
-          toggle={() => setIsOpenRating(!isOpenRating)}
+          isOpen={open.rating}
+          toggle={() => toggle("rating")}
         />
 
-        <Collapse isOpened={isOpenRating}>
+        <Collapse isOpened={open.rating}>
           <div className="max-h-[240px] overflow-y-auto pr-1">
             <FormGroup>
               {MockFiltros.rating.map((rate) => (
@@ -243,4 +237,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);

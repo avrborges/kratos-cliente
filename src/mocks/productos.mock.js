@@ -262,5 +262,49 @@ export const MockItems = [
             "https://picsum.photos/1000/1200?random=36",
         ],
         createdAt: '2024-07-08T21:00:00Z'
-    }
+    },
+    {
+        id: 13,
+        category: 'Hombres',
+        brand: 'Reebok',
+        name: 'Producto 13',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas faucibus lacus eget pharetra tristique. Donec ac hendrerit dui. Sed auctor dictum risus, sed mattis massa auctor at. Nullam imperdiet velit vel mollis euismod. Proin sed elementum est, vel vulputate nulla. Aliquam egestas quis sapien ut dictum. Integer sed eros in ante pharetra lacinia interdum vitae nisl. Nulla in dignissim tellus.',
+        rating: 4,
+        price: 129999,
+        offerprice: 119999,
+        discount: 8,
+        totalSales: 180,
+        stock: 10,
+        featured: false,
+        size: ['S', 'M', 'L', 'XL'],
+        colors: [ { name: 'Rojo', hex: '#FF0000' }, { name: 'Azul', hex: '#0000FF' }, { name: 'Verde', hex: '#008000' } ],
+        images: [
+            "https://picsum.photos/1000/1200?random=37",
+            "https://picsum.photos/1000/1200?random=38",
+            "https://picsum.photos/1000/1200?random=39",
+        ],
+        createdAt: '2024-07-10T12:00:00Z'
+    },
+    {
+        id: 14,
+        category: 'Niños',
+        brand: 'Adidas',
+        name: 'Producto 14',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maec enas faucibus lacus eget pharetra tristique. Donec ac hendrerit dui. Sed auctor dictum risus, sed mattis massa auctor at. Nullam imperdiet velit vel mollis euismod. Proin sed elementum est, vel vulputate nulla. Aliquam egestas quis sapien ut dictum. Integer sed eros in ante pharetra lacinia interdum vitae nisl. Nulla in dignissim tellus.',
+        rating: 5,
+        price: 139999,
+        offerprice: 129999,
+        discount: 12,
+        totalSales: 200,
+        stock: 5,
+        featured: true,
+        size: ['S', 'M', 'L', 'XL'],
+        colors: [ { name: 'Rojo', hex: '#FF0000' }, { name: 'Azul', hex: '#0000FF' }, { name: 'Verde', hex: '#008000' } ],
+        images: [
+            "https://picsum.photos/1000/1200?random=40",
+            "https://picsum.photos/1000/1200?random=41",
+            "https://picsum.photos/1000/1200?random=42",
+        ],
+        createdAt: '2024-07-12T14:00:00Z'
+    },
 ]

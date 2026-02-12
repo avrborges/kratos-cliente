@@ -1,27 +1,61 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPwd, setShowPwd] = useState(false);
+  /* -----------------------------------------
+   * State
+   * ----------------------------------------- */
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    showPwd: false,
+  });
 
-  const emailError =
-    email.trim() !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const { email, password, showPwd } = form;
 
-  const isValid = email !== "" && !emailError && password !== "";
+  /* -----------------------------------------
+   * Derived state
+   * ----------------------------------------- */
+  const emailError = useMemo(() => {
+    if (email.trim() === "") return false;
+    return !EMAIL_REGEX.test(email);
+  }, [email]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!isValid) return;
+  const isValid = useMemo(() => {
+    return email !== "" && !emailError && password !== "";
+  }, [email, emailError, password]);
 
-    console.log("LOGIN:", { email, password });
-  };
+  /* -----------------------------------------
+   * Handlers (estables)
+   * ----------------------------------------- */
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
+  const togglePassword = useCallback(() => {
+    setForm((prev) => ({ ...prev, showPwd: !prev.showPwd }));
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!isValid) return;
+
+      console.log("LOGIN:", { email, password });
+    },
+    [isValid, email, password]
+  );
+
+  /* -----------------------------------------
+   * UI
+   * ----------------------------------------- */
   return (
     <section className="py-20 bg-gray-50 min-h-screen flex items-center justify-center">
       <div
@@ -40,7 +74,7 @@ const Login = () => {
           Accedé a tu cuenta para continuar
         </p>
 
-        {/* Form email/password */}
+        {/* Form */}
         <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
           {/* Email */}
           <div className="flex flex-col gap-1">
@@ -60,11 +94,12 @@ const Login = () => {
               <EmailIcon className="text-gray-500" fontSize="small" />
               <input
                 type="email"
+                name="email"
                 placeholder="tu@email.com"
                 className="w-full bg-transparent outline-none text-[14px]"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                aria-invalid={emailError ? "true" : "false"}
+                onChange={handleChange}
+                aria-invalid={emailError}
                 aria-describedby={emailError ? "email-error" : undefined}
               />
             </div>
@@ -76,7 +111,7 @@ const Login = () => {
             )}
           </div>
 
-          {/* Password con toggle de visibilidad */}
+          {/* Password */}
           <div className="flex flex-col gap-1">
             <label className="text-[14px] font-medium text-gray-700">
               Contraseña
@@ -94,17 +129,17 @@ const Login = () => {
 
               <input
                 type={showPwd ? "text" : "password"}
+                name="password"
                 placeholder="••••••••"
                 className="w-full bg-transparent outline-none text-[14px]"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleChange}
                 aria-label="Contraseña"
               />
 
-              {/* Botón ver/ocultar */}
               <button
                 type="button"
-                onClick={() => setShowPwd((v) => !v)}
+                onClick={togglePassword}
                 aria-label={showPwd ? "Ocultar contraseña" : "Ver contraseña"}
                 className="
                   ml-auto flex items-center justify-center
@@ -144,7 +179,10 @@ const Login = () => {
         <div className="mt-6 text-center text-[14px]">
           <p className="text-gray-600">
             ¿No tenés cuenta?{" "}
-            <Link to="/registro" className="text-gray-900 font-semibold hover:underline">
+            <Link
+              to="/registro"
+              className="text-gray-900 font-semibold hover:underline"
+            >
               Crear una cuenta
             </Link>
           </p>
@@ -161,4 +199,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

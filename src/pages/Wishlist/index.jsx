@@ -11,7 +11,7 @@ import {
   formatCurrency,
   getThumbnail,
   getPriceInfo,
-} from "./wishlist.helpers";
+} from "../../helpers/wishlist.helpers";
 
 const Wishlist = () => {
   const { wishlist, removeFromWishlist } = useWishlist();

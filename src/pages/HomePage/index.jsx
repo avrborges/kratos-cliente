@@ -16,42 +16,97 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 // Data
 import { MockCategories, MockItems } from "../../mocks";
 
-// Helpers externos
+// Helpers
 import {
-  normalize,
   filterByCategory,
   getTop5BestSellers,
   getTop5NewItems,
   getTop5Featured,
   getTop5LastAvailable,
-} from "./homePage.helpers";
+} from "../../helpers/homePage.helpers";
+
+/** UI helpers (Drakos Premium UI) */
+const Container = ({ children }) => (
+  <div className="max-w-[1400px] mx-auto px-4">{children}</div>
+);
+
+const Card = ({ children }) => (
+  <div className="rounded-xl bg-white ring-1 ring-black/5 shadow px-6 pt-6 pb-2">
+    {children}
+  </div>
+);
+
+const SectionCard = React.memo(function SectionCard({
+  title,
+  subtitle,
+  rightSlot,
+  children,
+}) {
+  return (
+    <section className="py-10 bg-white">
+      <Container>
+        <Card>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div className="min-w-0">
+              <h2 className="text-[22px] font-semibold text-gray-900">{title}</h2>
+              {subtitle ? (
+                <p className="text-gray-500 text-[14px]">{subtitle}</p>
+              ) : null}
+            </div>
+
+            {rightSlot ? <div className="md:w-[60%]">{rightSlot}</div> : null}
+          </div>
+
+          <div className="mt-2 -mx-2">{children}</div>
+        </Card>
+      </Container>
+    </section>
+  );
+});
 
 const HomePage = () => {
-  const [value, setValue] = React.useState("Todos");
-  const handleChangeMenuSlider = (_, newValue) => setValue(newValue);
+  const [category, setCategory] = React.useState("Todos");
 
-  // → Filtrar por categoría y luego obtener top 5 más vendidos
-  const filteredAndTop5 = React.useMemo(() => {
-    const filtered = filterByCategory(MockItems, value);
-    return getTop5BestSellers(filtered);
-  }, [value]);
+  const handleChangeCategory = React.useCallback((_, newValue) => {
+    setCategory(newValue);
+  }, []);
 
-  // → Últimos productos
-  const sortedByNew = React.useMemo(
-    () => getTop5NewItems(MockItems),
-    []
-  );
+  /** Tabs memo: estable */
+  const categoryTabs = React.useMemo(() => {
+    return [
+      { key: "Todos", value: "Todos", label: "Todos" },
+      ...MockCategories.map((c) => ({
+        key: c.id,
+        value: c.name,
+        label: c.name,
+      })),
+    ];
+  }, []);
 
-  // → Destacados
-  const featuredProducts = React.useMemo(
-    () => getTop5Featured(MockItems),
-    []
-  );
+  /**
+   * Un solo memo: evita múltiples pasadas y deja claro qué depende de qué.
+   * Si mañana MockItems viene de props/estado, cambiás MockItems por items y listo.
+   */
+  const computed = React.useMemo(() => {
+    const bestSellers = getTop5BestSellers(filterByCategory(MockItems, category));
+    const newItems = getTop5NewItems(MockItems);
+    const featured = getTop5Featured(MockItems);
+    const lastAvailable = getTop5LastAvailable(MockItems);
 
-  // → Últimos disponibles
-  const lastAvailable5 = React.useMemo(
-    () => getTop5LastAvailable(MockItems),
-    []
+    return { bestSellers, newItems, featured, lastAvailable };
+  }, [category]);
+
+  const tabsUI = (
+    <Tabs
+      value={category}
+      onChange={handleChangeCategory}
+      variant="scrollable"
+      scrollButtons="auto"
+    >
+      {categoryTabs.map((t) => (
+        <Tab key={t.key} value={t.value} label={t.label} />
+      ))}
+    </Tabs>
   );
 
   return (
@@ -59,47 +114,18 @@ const HomePage = () => {
       <HomeSlider />
       <CategorySlider />
 
-      {/* Sección – Más vendidos */}
-      <section className="py-10 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4">
+      {/* Más vendidos */}
+      <SectionCard
+        title="Productos más vendidos"
+        subtitle="Descubrí nuestros productos más vendidos."
+        rightSlot={tabsUI}
+      >
+        <ProductsSlider MockItems={computed.bestSellers} />
+      </SectionCard>
 
-          <div className="rounded-xl bg-white ring-1 ring-black/5 shadow px-6 pt-6 pb-2">
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-[22px] font-semibold text-gray-900">
-                  Productos más vendidos
-                </h2>
-                <p className="text-gray-500 text-[14px]">
-                  Descubrí nuestros productos más vendidos.
-                </p>
-              </div>
-
-              <div className="md:w-[60%]">
-                <Tabs
-                  value={value}
-                  onChange={handleChangeMenuSlider}
-                  variant="scrollable"
-                  scrollButtons="auto"
-                >
-                  <Tab value="Todos" label="Todos" />
-                  {MockCategories.map((category) => (
-                    <Tab key={category.id} value={category.name} label={category.name} />
-                  ))}
-                </Tabs>
-              </div>
-            </div>
-
-            <div className="mt-2 -mx-2">
-              <ProductsSlider MockItems={filteredAndTop5} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Envío gratis */}
+      {/* Envío gratis + Ads */}
       <section className="py-10 bg-white flex flex-col gap-8">
-        <div className="max-w-[1400px] mx-auto px-4 flex justify-center">
+        <Container>
           <div className="EnvioBanner w-full rounded-xl bg-gray-50 ring-1 ring-black/5 shadow px-8 py-8 flex justify-between">
             <div className="flex items-center gap-6">
               <div className="w-16 h-16 rounded-full bg-white/70 backdrop-blur flex items-center justify-center ring-1 ring-black/5 shadow-sm">
@@ -124,88 +150,41 @@ const HomePage = () => {
               </Link>
             </div>
           </div>
-        </div>
+        </Container>
 
-        <div className="max-w-[1400px] mx-auto px-4">
+        <Container>
           <AdsBannerSlider />
-        </div>
+        </Container>
       </section>
 
       {/* Nuevos ingresos */}
-      <section className="py-10 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4">
-
-          <div className="rounded-xl bg-white ring-1 ring-black/5 shadow px-6 pt-6 pb-2">
-
-            <div className="flex flex-col md:flex-row md:justify-between mb-4">
-              <div>
-                <h2 className="text-[22px] font-semibold text-gray-900">
-                  Últimos ingresos
-                </h2>
-                <p className="text-gray-500 text-[14px]">
-                  Explorá los productos más recientes.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-2 -mx-2">
-              <ProductsSlider MockItems={sortedByNew} />
-            </div>
-
-          </div>
-        </div>
-      </section>
+      <SectionCard
+        title="Últimos ingresos"
+        subtitle="Explorá los productos más recientes."
+      >
+        <ProductsSlider MockItems={computed.newItems} />
+      </SectionCard>
 
       {/* Destacados */}
-      <section className="py-10 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="rounded-xl bg-white ring-1 ring-black/5 shadow px-6 pt-6 pb-2">
-
-            <div className="mb-4">
-              <h2 className="text-[22px] font-semibold text-gray-900">
-                Productos Destacados
-              </h2>
-              <p className="text-gray-500 text-[14px]">
-                Descubrí nuestros productos destacados.
-              </p>
-            </div>
-
-            <div className="mt-2 -mx-2">
-              <ProductsSlider MockItems={featuredProducts} />
-            </div>
-
-          </div>
-        </div>
-      </section>
+      <SectionCard
+        title="Productos Destacados"
+        subtitle="Descubrí nuestros productos destacados."
+      >
+        <ProductsSlider MockItems={computed.featured} />
+      </SectionCard>
 
       {/* Últimos disponibles */}
-      <section className="py-10 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="rounded-xl bg-white ring-1 ring-black/5 shadow px-6 pt-6 pb-2">
-
-            <div className="mb-4">
-              <h2 className="text-[22px] font-semibold text-gray-900">
-                Últimos disponibles
-              </h2>
-              <p className="text-gray-500 text-[14px]">
-                Quedan pocas unidades.
-              </p>
-            </div>
-
-            <div className="mt-2 -mx-2">
-              <ProductsSlider MockItems={lastAvailable5} />
-            </div>
-
-          </div>
-        </div>
-      </section>
+      <SectionCard
+        title="Últimos disponibles"
+        subtitle="Quedan pocas unidades."
+      >
+        <ProductsSlider MockItems={computed.lastAvailable} />
+      </SectionCard>
 
       {/* Blog */}
       <section className="py-10 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4">
-
-          <div className="rounded-xl bg-white ring-1 ring-black/5 shadow px-6 pt-6 pb-2">
-
+        <Container>
+          <Card>
             <div className="flex justify-between mb-4">
               <div className="w-[70%]">
                 <h2 className="text-[22px] font-semibold text-gray-900">
@@ -228,9 +207,8 @@ const HomePage = () => {
             <div className="mt-2 -mx-2">
               <BlogSlider />
             </div>
-
-          </div>
-        </div>
+          </Card>
+        </Container>
       </section>
     </>
   );

@@ -24,7 +24,7 @@ import {
   isLowStock,
   isItemInWishlist,
   buildCartItem,
-} from "./productDetails.helpers";
+} from "../../helpers/productDetails.helpers";
 
 const ProductDetails = () => {
   const { state } = useLocation();

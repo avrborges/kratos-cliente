@@ -5,7 +5,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // cambiar al tuyo real
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>

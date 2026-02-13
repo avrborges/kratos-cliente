@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useMemo, useCallback, useEffect } from "react";
 
 import Sidebar from "../../components/Sidebar";
 import { MockItems } from "../../mocks";
@@ -20,6 +19,7 @@ import {
 } from "../../helpers/productListing.helpers";
 
 import { filterProducts } from "../../helpers/filterProducts.helpers";
+import { useUrlFilters } from "../../helpers/useUrlFilters.helpers";
 
 /* ======================================================
    Drakos Premium UI wrappers
@@ -34,141 +34,56 @@ const Card = ({ children, className = "" }) => (
   </div>
 );
 
+/* ======================================================
+   Defaults + Schema de filtros (URL <-> state)
+====================================================== */
+const DEFAULT_FILTERS = {
+  categories: [],
+  sizes: [],
+  colors: [],
+  rating: null,
+  price: [1000, 150000],
+};
+
+const FILTER_SCHEMA = {
+  // canonical: categories, legacy: category
+  categories: { param: "categories", type: "csv", fallbackParam: "category" },
+  sizes: { param: "sizes", type: "csv" },
+  colors: { param: "colors", type: "csv" },
+  rating: { param: "rating", type: "number" },
+  // formato URL: price=1000-150000
+  price: { param: "price", type: "range" },
+};
+
 export default function ProductListing() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  /* ======================================================
+     1) Filtros sincronizados con URL usando helper
+  ====================================================== */
+  const { filters, setFilters, updateURL, searchParams } = useUrlFilters({
+    defaults: DEFAULT_FILTERS,
+    schema: FILTER_SCHEMA,
+  });
 
   /* ======================================================
-     1) LECTURA DESDE URL (source of truth)
+     2) Estado derivado desde URL para page/sort/view
+     (la URL sigue siendo source of truth para esto)
   ====================================================== */
   const pageParam = useMemo(() => {
     const p = Number(searchParams.get("page"));
     return Number.isFinite(p) && p >= 1 ? p : 1;
   }, [searchParams]);
 
-  const sortBy = useMemo(
-    () => searchParams.get("sort") || "default",
-    [searchParams]
-  );
+  const sortBy = useMemo(() => searchParams.get("sort") || "default", [searchParams]);
 
   const viewMode = useMemo(() => {
     const v = searchParams.get("view");
     return v === "table" ? "table" : "grid";
   }, [searchParams]);
 
-  /* ======================================================
-     2) FILTROS (estado React)
-  ====================================================== */
-  const [filters, setFilters] = useState({
-    categories: [],
-    sizes: [],
-    colors: [],
-    rating: null,
-    price: [1000, 150000],
-  });
-
-  /**
-   * ✅ FLAG CLAVE:
-   * evita que el efecto que escribe la URL borre parámetros
-   * antes de que inicialicemos los filtros desde la URL.
-   */
-  const [hasInitializedFromURL, setHasInitializedFromURL] = useState(false);
+  const isGrid = viewMode === "grid";
 
   /* ======================================================
-     3) updateURL (MUY IMPORTANTE)
-     - NO usa searchParams “capturado”
-     - siempre parte del prev real
-  ====================================================== */
-  const updateURL = useCallback(
-    (changes) => {
-      setSearchParams((prev) => {
-        const params = new URLSearchParams(prev);
-
-        Object.entries(changes).forEach(([key, value]) => {
-          if (value === undefined || value === null || value === "") {
-            params.delete(key);
-          } else {
-            params.set(key, String(value));
-          }
-        });
-
-        return params;
-      });
-    },
-    [setSearchParams]
-  );
-
-  /* ======================================================
-     2.1) LEER CATEGORÍAS DESDE LA URL (con fallback)
-     - /productlisting?categories=Niños
-     - /productlisting?category=Niños (fallback legacy)
-  ====================================================== */
-  const urlCategories = useMemo(() => {
-    const csv = searchParams.get("categories");
-    const single = searchParams.get("category"); // fallback
-
-    if (csv) {
-      return csv
-        .split(",")
-        .map((c) => c.trim())
-        .filter(Boolean);
-    }
-
-    if (single) {
-      return [single.trim()];
-    }
-
-    return [];
-  }, [searchParams]);
-
-  /* ======================================================
-     2.2) HIDRATAR filtros desde la URL
-     - Si venís desde Home con ?categories=...
-       esto marca automáticamente el filtro en Sidebar.
-  ====================================================== */
-  useEffect(() => {
-    setFilters((prev) => {
-      const same =
-        prev.categories.length === urlCategories.length &&
-        prev.categories.every((c, i) => c === urlCategories[i]);
-
-      if (same) return prev;
-
-      return {
-        ...prev,
-        categories: urlCategories,
-      };
-    });
-
-    // ✅ ya inicializamos desde URL (clave para no borrar params)
-    setHasInitializedFromURL(true);
-  }, [urlCategories]);
-
-  /* ======================================================
-     2.3) SINCRONIZAR URL desde filters (NORMALIZAR)
-     - Solo DESPUÉS de inicializar desde URL
-     - Mantiene SOLO `categories`
-     - Elimina `category` (legacy) para evitar URLs duplicadas
-  ====================================================== */
-  useEffect(() => {
-    if (!hasInitializedFromURL) return; // ⛔ evita el bug
-
-    const nextCsv = filters.categories.join(",");
-    const currentCsv = searchParams.get("categories") || "";
-
-    if (nextCsv === currentCsv) return;
-
-    updateURL({
-      categories: nextCsv || null, // ✅ canonical
-      category: null,              // ✅ borra legacy
-      page: 1,
-    });
-
-    // NOTA: no agregamos searchParams para evitar loops
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.categories, hasInitializedFromURL, updateURL]);
-
-  /* ======================================================
-     4) Pipeline: withIndex -> filter -> sort -> paginate
+     3) Pipeline: withIndex -> filter -> sort -> paginate
   ====================================================== */
   const itemsWithIndex = useMemo(
     () => MockItems.map((it, idx) => ({ ...it, __originalIndex: idx })),
@@ -186,31 +101,27 @@ export default function ProductListing() {
   );
 
   /* ======================================================
-     5) Reset a page=1 SOLO cuando cambian filtros o sort
-        y SOLO si pageParam != 1 (evita reescrituras)
+     4) Reset a page=1 cuando cambian filtros o sort
+     (mantiene categories, no se borra nada)
   ====================================================== */
   useEffect(() => {
     if (pageParam !== 1) {
-      updateURL({ page: 1 }); // ✅ esto NO borra categories
+      updateURL({ page: 1 });
     }
-    // 🚫 NO pageParam como dep (tu criterio original)
-  }, [filters, sortBy, updateURL]); // ✅ agrego updateURL por buena práctica
+  }, [filters, sortBy, pageParam, updateURL]);
 
   /* ======================================================
-     6) TotalPages + clamp page
+     5) TotalPages + clamp page
   ====================================================== */
   const totalPages = useMemo(() => {
     const tp = Math.ceil(sortedItems.length / ITEMS_PER_PAGE);
     return tp >= 1 ? tp : 1;
   }, [sortedItems.length]);
 
-  const page = useMemo(
-    () => clamp(pageParam, 1, totalPages),
-    [pageParam, totalPages]
-  );
+  const page = useMemo(() => clamp(pageParam, 1, totalPages), [pageParam, totalPages]);
 
   /* ======================================================
-     7) Canonicalizar page inválida (ej: page=999)
+     6) Canonicalizar page inválida (ej: page=999)
   ====================================================== */
   useEffect(() => {
     if (page !== pageParam) {
@@ -219,7 +130,7 @@ export default function ProductListing() {
   }, [page, pageParam, updateURL]);
 
   /* ======================================================
-     8) Paginación final
+     7) Paginación final
   ====================================================== */
   const { items: currentItems, start, end, totalItems } = useMemo(
     () => paginateItems(sortedItems, page),
@@ -232,7 +143,7 @@ export default function ProductListing() {
   );
 
   /* ======================================================
-     9) Handlers UI
+     8) Handlers UI
   ====================================================== */
   const handleChangePage = useCallback(
     (_e, value) => {
@@ -248,8 +159,6 @@ export default function ProductListing() {
 
   const setGrid = useCallback(() => updateURL({ view: "grid" }), [updateURL]);
   const setTable = useCallback(() => updateURL({ view: "table" }), [updateURL]);
-
-  const isGrid = viewMode === "grid";
 
   /* ======================================================
      UI
@@ -344,7 +253,9 @@ export default function ProductListing() {
               >
                 {isGrid
                   ? currentItems.map((item) => <ProductItem key={item.id} item={item} />)
-                  : currentItems.map((item) => <ProductItemTable key={item.id} item={item} />)}
+                  : currentItems.map((item) => (
+                      <ProductItemTable key={item.id} item={item} />
+                    ))}
               </div>
             )}
 

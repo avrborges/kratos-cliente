@@ -73,7 +73,9 @@ const Navigation = () => {
               {MockCategories.map((category) => (
                 <li key={category.id} className="list-none">
                   <Link
-                    to={category.link}
+                    to={`/productlisting?categories=${encodeURIComponent(
+                      category.name
+                    )}&page=1`}
                     className="text-[14px] text-gray-800 font-medium hover:text-gray-600 transition-colors relative 
                                after:absolute after:left-0 after:bottom-[-2px] after:h-[2px] after:w-0 after:bg-gray-800
                                after:transition-all hover:after:w-full"
@@ -85,7 +87,7 @@ const Navigation = () => {
             </ul>
           </div>
 
-          {/* === COL 3: Envíos a todo el país === */}
+          {/* === COL 3: Envíos === */}
           <div className="w-[20%] flex justify-end items-center gap-2">
             <LocalShippingIcon className="text-gray-700 !text-[18px]" />
             <p className="text-[14px] text-gray-700 font-medium">

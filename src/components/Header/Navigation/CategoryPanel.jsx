@@ -63,7 +63,9 @@ const CategoryPanel = ({ open, onClose }) => {
             key={category.name}
             onClick={onClose}
             component={Link}
-            to={category.link}
+            to={`/productlisting?categories=${encodeURIComponent(
+              category.name
+            )}&page=1`}
             sx={{
               px: 3,
               borderRadius: "12px",
@@ -79,14 +81,15 @@ const CategoryPanel = ({ open, onClose }) => {
             <ListItemText
               primary={category.name}
               primaryTypographyProps={{
-                className: "text-gray-800 text-[15px] font-medium tracking-tight",
+                className:
+                  "text-gray-800 text-[15px] font-medium tracking-tight",
               }}
             />
           </ListItemButton>
         ))}
       </List>
 
-      {/* Footer opcional */}
+      {/* Footer */}
       <div className="px-5 py-4 border-t border-gray-200 text-center text-gray-500 text-[13px]">
         © {new Date().getFullYear()} Drakos Store
       </div>

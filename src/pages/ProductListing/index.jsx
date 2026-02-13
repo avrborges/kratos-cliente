@@ -66,6 +66,13 @@ export default function ProductListing() {
     price: [1000, 150000],
   });
 
+  /**
+   * ✅ FLAG CLAVE:
+   * evita que el efecto que escribe la URL borre parámetros
+   * antes de que inicialicemos los filtros desde la URL.
+   */
+  const [hasInitializedFromURL, setHasInitializedFromURL] = useState(false);
+
   /* ======================================================
      3) updateURL (MUY IMPORTANTE)
      - NO usa searchParams “capturado”
@@ -91,6 +98,76 @@ export default function ProductListing() {
   );
 
   /* ======================================================
+     2.1) LEER CATEGORÍAS DESDE LA URL (con fallback)
+     - /productlisting?categories=Niños
+     - /productlisting?category=Niños (fallback legacy)
+  ====================================================== */
+  const urlCategories = useMemo(() => {
+    const csv = searchParams.get("categories");
+    const single = searchParams.get("category"); // fallback
+
+    if (csv) {
+      return csv
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean);
+    }
+
+    if (single) {
+      return [single.trim()];
+    }
+
+    return [];
+  }, [searchParams]);
+
+  /* ======================================================
+     2.2) HIDRATAR filtros desde la URL
+     - Si venís desde Home con ?categories=...
+       esto marca automáticamente el filtro en Sidebar.
+  ====================================================== */
+  useEffect(() => {
+    setFilters((prev) => {
+      const same =
+        prev.categories.length === urlCategories.length &&
+        prev.categories.every((c, i) => c === urlCategories[i]);
+
+      if (same) return prev;
+
+      return {
+        ...prev,
+        categories: urlCategories,
+      };
+    });
+
+    // ✅ ya inicializamos desde URL (clave para no borrar params)
+    setHasInitializedFromURL(true);
+  }, [urlCategories]);
+
+  /* ======================================================
+     2.3) SINCRONIZAR URL desde filters (NORMALIZAR)
+     - Solo DESPUÉS de inicializar desde URL
+     - Mantiene SOLO `categories`
+     - Elimina `category` (legacy) para evitar URLs duplicadas
+  ====================================================== */
+  useEffect(() => {
+    if (!hasInitializedFromURL) return; // ⛔ evita el bug
+
+    const nextCsv = filters.categories.join(",");
+    const currentCsv = searchParams.get("categories") || "";
+
+    if (nextCsv === currentCsv) return;
+
+    updateURL({
+      categories: nextCsv || null, // ✅ canonical
+      category: null,              // ✅ borra legacy
+      page: 1,
+    });
+
+    // NOTA: no agregamos searchParams para evitar loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.categories, hasInitializedFromURL, updateURL]);
+
+  /* ======================================================
      4) Pipeline: withIndex -> filter -> sort -> paginate
   ====================================================== */
   const itemsWithIndex = useMemo(
@@ -112,12 +189,12 @@ export default function ProductListing() {
      5) Reset a page=1 SOLO cuando cambian filtros o sort
         y SOLO si pageParam != 1 (evita reescrituras)
   ====================================================== */
-    useEffect(() => {
-      // Solo resetear si NO estamos ya en la página 1
-      if (pageParam !== 1) {
-        updateURL({ page: 1 });
-      }
-    }, [filters, sortBy]); // 🚫 NO pageParam acá
+  useEffect(() => {
+    if (pageParam !== 1) {
+      updateURL({ page: 1 }); // ✅ esto NO borra categories
+    }
+    // 🚫 NO pageParam como dep (tu criterio original)
+  }, [filters, sortBy, updateURL]); // ✅ agrego updateURL por buena práctica
 
   /* ======================================================
      6) TotalPages + clamp page
@@ -134,7 +211,6 @@ export default function ProductListing() {
 
   /* ======================================================
      7) Canonicalizar page inválida (ej: page=999)
-        usando updateURL estable
   ====================================================== */
   useEffect(() => {
     if (page !== pageParam) {
@@ -175,7 +251,6 @@ export default function ProductListing() {
 
   const isGrid = viewMode === "grid";
 
-  console.log("pageParam:", pageParam, "page:", page, "totalPages:", totalPages);
   /* ======================================================
      UI
   ====================================================== */
@@ -269,9 +344,7 @@ export default function ProductListing() {
               >
                 {isGrid
                   ? currentItems.map((item) => <ProductItem key={item.id} item={item} />)
-                  : currentItems.map((item) => (
-                      <ProductItemTable key={item.id} item={item} />
-                    ))}
+                  : currentItems.map((item) => <ProductItemTable key={item.id} item={item} />)}
               </div>
             )}
 

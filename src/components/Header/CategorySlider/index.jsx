@@ -35,7 +35,13 @@ const CategorySlider = () => {
         >
           {MockCategories.map((category) => (
             <SwiperSlide key={category.id}>
-              <Link to={category.link} className="block h-full">
+              {/* ✅ Usar `categories` (plural) */}
+              <Link
+                to={`/productlisting?categories=${encodeURIComponent(
+                  category.name
+                )}&page=1`}
+                className="block h-full"
+              >
                 <div
                   className={[
                     "group h-full rounded-xl bg-white text-center",
